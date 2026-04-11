@@ -98,6 +98,8 @@ const PROFILE_SCHEMA = {
     description: "Desired level of involvement in investment decisions"
   }
 };
+// Simple in-memory cache
+const cache = new Map();
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -158,6 +160,17 @@ export default async function handler(req, res) {
     }
 
     const userPrompt = JSON.stringify(promptPayload, null, 2);
+     // Create cache key
+const cacheKey = JSON.stringify({ input, context });
+
+// Check cache
+if (cache.has(cacheKey)) {
+  return res.status(200).json({
+    success: true,
+    profile: cache.get(cacheKey),
+    cached: true
+  });
+}
 
     // Call OpenAI API
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -207,7 +220,9 @@ export default async function handler(req, res) {
         error: `Missing required fields in AI response: ${missingFields.join(', ')}` 
       });
     }
-
+// Store in cache
+cache.set(cacheKey, profile);
+     
     // Return successful response
     return res.status(200).json({ 
       success: true,
