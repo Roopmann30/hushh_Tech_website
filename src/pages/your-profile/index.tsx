@@ -33,6 +33,7 @@ const ProfilePage = () => {
   const [userEmail, setUserEmail] = useState<string>("");
   const [userId, setUserId] = useState<string | null>(null);
   const [preferences, setPreferences] = useState<UserPreferenceProfile | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const formatList = (items?: string[]) => (items && items.length > 0 ? items.join(", ") : "unknown");
 
@@ -76,8 +77,10 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
+    let isMounted = true;
     // Get user email from Supabase session and fetch profile
     const fetchUserProfile = async () => {
+      
       try {
         console.log('🔍 Fetching user session...');
         
@@ -102,20 +105,42 @@ const ProfilePage = () => {
         setUserEmail(user.email);
         setUserId(user.id);
 
-        await loadPreferences(user.id);
-        
-        // Check if user exists in database using the API
-        await checkUserInDatabase(user.email);
-        
-      } catch (error) {
-        console.error('❌ Error fetching user session:', error);
-        setError("Failed to load user session");
-        setIsLoading(false);
+       if (isMounted) {
+          setUserEmail(user.email);
+          setUserId(user.id);
+          
+          // Fetch preferences and database profile
+          await loadPreferences(user.id);
+          await checkUserInDatabase(user.email);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching user session:', error);
+        if (isMounted) {
+          setError("Failed to load user session");
+          setIsLoading(false)
       }
-    };
+      }
+  };
 
-    void fetchUserProfile();
-  }, [navigate, status, user]);
+  fetchUserProfile();
+  return () => { isMounted = false; };
+}, [navigate, status, user]);
+  
+   const handleRetry = async () => {
+  if (!userEmail) {
+    navigate(buildLoginRedirectPath('/your-profile'), { replace: true });
+    return;
+  }
+
+  setIsRetrying(true);
+  setError(null);
+
+  await checkUserInDatabase(userEmail);
+
+  setIsRetrying(false);
+};
+
+  
 
   const checkUserInDatabase = async (email: string) => {
     try {
@@ -129,7 +154,6 @@ const ProfilePage = () => {
           }
         }
       );
-      
       console.log('📥 API Response:', response.data);
       
       if (response.data && response.data.user) {
@@ -249,11 +273,27 @@ const ProfilePage = () => {
           <User className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">No Profile Found</h2>
           
-          {error ? (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-700 text-sm font-medium">Error: {error}</p>
-            </div>
-          ) : (
+         {error ? (
+  <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+    
+    <p className="text-yellow-800 text-sm font-medium mb-2">
+      Data might be outdated. Showing last saved data.
+    </p>
+
+    <p className="text-red-600 text-sm mb-3">
+      {error}
+    </p>
+
+    <button
+      onClick={handleRetry}
+      disabled={isRetrying}
+      className="px-4 py-2 bg-red-500 text-white rounded-md text-sm hover:bg-red-600"
+    >
+      {isRetrying ? "Retrying..." : "Retry"}
+    </button>
+
+  </div>
+) : (
             <p className="text-gray-600 mb-6">You haven't completed your registration yet.</p>
           )}
           
