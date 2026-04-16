@@ -182,6 +182,7 @@ export function useStockQuotes(refreshInterval = 120000) {
 
   const fetchAllQuotes = useCallback(async () => {
     try {
+      setLoading(true);
       setError(null);
 
       if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -205,7 +206,7 @@ export function useStockQuotes(refreshInterval = 120000) {
 
       const data: EdgeFunctionResponse = await response.json();
 
-      if (data.success && data.quotes.length > 0) {
+      if (data.success && Array.isArray(data.quotes) && data.quotes.length > 0) {
         // Map edge function response to our StockQuote format
         const mappedQuotes: StockQuote[] = data.quotes.map(q => ({
           symbol: q.symbol,
@@ -222,12 +223,19 @@ export function useStockQuotes(refreshInterval = 120000) {
         setLastUpdated(new Date());
       }
       setLoading(false);
-    } catch (err) {
-      console.error('Error fetching stock quotes:', err);
-      setError('Failed to fetch stock quotes');
-      setLoading(false);
-    }
-  }, []);
+    } catch (err: any) {
+  console.error('Error fetching stock quotes:', err);
+
+  if (err?.name === 'AbortError') {
+    setError('Request timed out');
+  } else {
+    setError('Failed to fetch stock quotes');
+  }
+      
+  setQuotes(generateFallbackData());
+  setLoading(false);
+}
+  }, [SUPABASE_URL, SUPABASE_ANON_KEY]);
 
   // Initial fetch
   useEffect(() => {
