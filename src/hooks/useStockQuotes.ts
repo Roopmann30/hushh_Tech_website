@@ -179,33 +179,52 @@ export function useStockQuotes(refreshInterval = 120000) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  async function fetchQuotesOnce() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error('VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY is not configured');
+  }
 
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/stock-quotes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'apikey': SUPABASE_ANON_KEY || '',
+    },
+    body: JSON.stringify({ symbols: STOCK_SYMBOLS }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch quotes: ${response.status}`);
+  }
+
+  return response.json();
+}
+  async function fetchWithRetry(retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fetchQuotesOnce();
+    } catch (err) {
+      if (i === retries - 1) throw err;
+
+      // wait before retry (simple backoff)
+      await new Promise(res => setTimeout(res, 1000 * (i + 1)));
+    }
+  }
+}
+  
   const fetchAllQuotes = useCallback(async () => {
     try {
+       setLoading(true);  
       setError(null);
 
       if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
         throw new Error('VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY is not configured');
       }
-      
-      // Call Supabase edge function
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/stock-quotes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'apikey': SUPABASE_ANON_KEY || '',
-        },
-        body: JSON.stringify({ symbols: STOCK_SYMBOLS }),
-      });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch quotes: ${response.status}`);
-      }
+      const data: EdgeFunctionResponse = await fetchWithRetry();
 
-      const data: EdgeFunctionResponse = await response.json();
-
-      if (data.success && data.quotes.length > 0) {
+      if (data.success && Array.isArray(data.quotes) && data.quotes.length > 0){
         // Map edge function response to our StockQuote format
         const mappedQuotes: StockQuote[] = data.quotes.map(q => ({
           symbol: q.symbol,
@@ -227,7 +246,7 @@ export function useStockQuotes(refreshInterval = 120000) {
       setError('Failed to fetch stock quotes');
       setLoading(false);
     }
-  }, []);
+  }, [SUPABASE_URL, SUPABASE_ANON_KEY]);
 
   // Initial fetch
   useEffect(() => {
