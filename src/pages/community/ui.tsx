@@ -119,10 +119,10 @@ export default function CommunityPage() {
               <Link
                 key={post.id}
                 to={getPostUrl(post)}
-                className="block group"
+                className="block group focus:outline-none focus:ring-2 focus:ring-hushh-blue rounded-xl"
               >
                 <article
-                  className={`py-6 ${
+                  className={`py-6 rounded-xl transition-all group-hover:bg-gray-50 ${
                     index < filteredContent.length - 1
                       ? "border-b border-gray-200"
                       : ""
