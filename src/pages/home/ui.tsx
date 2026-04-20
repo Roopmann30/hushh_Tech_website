@@ -102,9 +102,14 @@ export default function HomePage() {
             onClick={primaryCTA.action}
             disabled={primaryCTA.loading}
             variant={HushhTechCtaVariant.BLACK}
+            className={primaryCTA.loading ? "opacity-60 cursor-not-allowed" : ""}
           >
-            {primaryCTA.text}
-            <span className="material-symbols-outlined thin-icon text-lg">arrow_forward</span>
+           {primaryCTA.loading ? "Processing..." : primaryCTA.text}
+{!primaryCTA.loading && (
+  <span className="material-symbols-outlined thin-icon text-lg">
+    arrow_forward
+  </span>
+)}
           </HushhTechCta>
           <HushhTechCta
             onClick={() => onNavigate("/discover-fund-a")}
