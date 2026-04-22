@@ -9,6 +9,19 @@ import emailLogin from "./emailLogin";
 import appleSignIn from "./appleSignIn";
 import mfaService from "./mfaService";
 
+export {
+  googleSignIn,
+  appleSignIn,
+  getUserDetails,
+  signOut,
+  getAccessToken,
+  isLoggedIn,
+  getFullName,
+  getSession,
+  emailLogin,
+  mfaService as mfa
+};
+
 const authentication = {
   googleSignIn: googleSignIn,
   appleSignIn: appleSignIn,
