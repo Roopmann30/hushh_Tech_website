@@ -103,12 +103,14 @@ export default function HomePage() {
             disabled={primaryCTA.loading}
             variant={HushhTechCtaVariant.BLACK}
           >
-           {primaryCTA.loading ? "Processing..." : primaryCTA.text}
-{!primaryCTA.loading && (
-  <span className="material-symbols-outlined thin-icon text-lg">
-    arrow_forward
-  </span>
-)}
+           {primaryCTA.text}
+           {primaryCTA.loading ? (
+             <SpinnerIcon className="animate-spin text-lg" />
+           ) : (
+             <span className="material-symbols-outlined thin-icon text-lg">
+               arrow_forward
+             </span>
+           )}
           </HushhTechCta>
           <HushhTechCta
             onClick={() => onNavigate("/discover-fund-a")}
