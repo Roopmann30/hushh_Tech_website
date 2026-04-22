@@ -195,7 +195,8 @@ export function useStockQuotes(refreshInterval = 120000) {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch quotes: ${response.status}`);
+    const errorText = await response.text();
+    throw new Error(`Failed to fetch quotes: ${response.status}. Body: ${errorText}`);
   }
 
   return response.json();
