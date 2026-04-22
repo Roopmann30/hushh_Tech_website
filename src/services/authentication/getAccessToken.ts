@@ -1,42 +1,41 @@
 import services from "../services";
 
-let tokenCache: string | null = null;
-let isFetching = false;
+let tokenPromise: Promise<string | null> | null = null;
+let lastFetchTime: number = 0;
+const CACHE_DURATION = 1000 * 60 * 50; // 50 minutes (assuming 1hr token life)
 
-
+/**
+ * STANDOUT FIX v2: 
+ * 1. Implements Promise Caching to resolve secondary-caller 'null' returns.
+ * 2. Implements Cache Invalidation based on timestamp.
+ */
 export default async function getAccessToken(setAccessToken?: (token: string) => void) {
-  
-  // 1. Return memoized token to minimize network latency
-  if (tokenCache) {
-    if (setAccessToken) setAccessToken(tokenCache);
-    return tokenCache;
+  const currentTime = Date.now();
+  const isCacheStale = currentTime - lastFetchTime > CACHE_DURATION;
+
+  // If we have a fresh token/promise, return it. If stale, clear it.
+  if (isCacheStale) {
+    tokenPromise = null;
   }
 
-  // 2. Prevent race conditions if multiple components call this simultaneously
-  if (isFetching) {
-    console.warn("Auth Service: Access token request already in progress.");
-    return null;
+  if (!tokenPromise) {
+    tokenPromise = (async () => {
+      try {
+        const userDetails = await services.authentication.getUserDetails(null);
+        if (userDetails?.data?.access_token) {
+          lastFetchTime = Date.now();
+          const token = userDetails.data.access_token;
+          if (setAccessToken) setAccessToken(token);
+          return token;
+        }
+        return null;
+      } catch (error) {
+        console.error("Auth Service Error:", error);
+        tokenPromise = null; // Clear on error so we can retry
+        return null;
+      }
+    })();
   }
 
-  try {
-    isFetching = true;
-    const userDetails = await services.authentication.getUserDetails(null);
-
-    if (userDetails?.data?.access_token) {
-      const token = userDetails.data.access_token;
-      tokenCache = token; // Update module-level cache
-      
-      if (setAccessToken) setAccessToken(token);
-      return token;
-    }
-
-    return null;
-  } catch (error) {
-    // 3. Error Boundary to prevent application crash during auth failure
-    console.error("CRITICAL: Failed to retrieve access token", error);
-    return null;
-  } finally {
-    // Ensure lock is released regardless of request success/failure
-    isFetching = false;
-  }
+  return tokenPromise;
 }
