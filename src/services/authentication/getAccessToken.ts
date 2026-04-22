@@ -17,7 +17,7 @@ export default async function getAccessToken(setAccessToken?: (token: string) =>
       } catch (error) {
         console.error("Auth Service: Request failed", error);
         tokenPromise = null; // Allow retry on failure
-        return null;
+        throw error; // Propagate error to the caller
       }
     })();
   }
