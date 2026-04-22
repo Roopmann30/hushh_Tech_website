@@ -49,6 +49,7 @@ export default function CommunityPage() {
         rightType="hamburger"
       />
 
+      
       {/* ═══ Main ═══ */}
       <main className="px-6 flex-grow max-w-md mx-auto w-full pb-32">
         {/* ── Hero ── */}
