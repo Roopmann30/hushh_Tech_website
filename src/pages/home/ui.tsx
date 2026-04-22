@@ -102,7 +102,6 @@ export default function HomePage() {
             onClick={primaryCTA.action}
             disabled={primaryCTA.loading}
             variant={HushhTechCtaVariant.BLACK}
-            className={primaryCTA.loading ? "opacity-60 cursor-not-allowed" : ""}
           >
            {primaryCTA.loading ? "Processing..." : primaryCTA.text}
 {!primaryCTA.loading && (
