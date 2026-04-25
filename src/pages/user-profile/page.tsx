@@ -35,7 +35,7 @@ const UserProfilePage = () => {
     if (!passwords.new || passwords.new !== passwords.confirm) {
       return alert("Passwords do not match or are empty!");
     }
-    console.log("Updating...", passwords);
+    // The actual password update logic should be implemented here.
     alert("Password change request submitted!");
   };
 
