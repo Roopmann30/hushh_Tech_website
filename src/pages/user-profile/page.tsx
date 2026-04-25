@@ -32,8 +32,8 @@ const UserProfilePage = () => {
   const user = { name: "John Doe", email: "john.doe@example.com" };
 
   const handlePasswordChange = () => {
-    if (!passwords.new || passwords.new !== passwords.confirm) {
-      return alert("Passwords do not match or are empty!");
+    if (!passwords.new || passwords.new.length < 8 || passwords.new !== passwords.confirm) {
+      return alert("New password must be at least 8 characters and match the confirmation.");
     }
     // The actual password update logic should be implemented here.
     alert("Password change request submitted!");
