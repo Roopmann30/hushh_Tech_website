@@ -11,7 +11,7 @@
  * - Shark (#1D1D1F) for dark surfaces
  *
  * Typography: Proper English capitalization (sentence/title case).
- * Logic stays in logic.ts — zero changes there.
+ * Updated: Performance-based glow logic integrated.
  */
 import { useHomeLogic } from "./logic";
 import HushhTechHeader from "../../components/hushh-tech-header/HushhTechHeader";
@@ -26,10 +26,11 @@ import HushhTechCta, {
 const playfair = { fontFamily: "'Playfair Display', serif" };
 
 export default function HomePage() {
-  const { session, primaryCTA, onNavigate } = useHomeLogic();
+  // Pulling isMarketPositive from logic to drive the performance glow
+  const { session, primaryCTA, onNavigate, isMarketPositive } = useHomeLogic();
 
   return (
-    <div
+    <div 
       data-page="home"
       className="bg-white antialiased text-gray-900 min-h-screen flex flex-col relative selection:bg-hushh-blue selection:text-white"
     >
@@ -166,12 +167,21 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Fund A Card ── */}
+        {/* ── Fund A Card (Dynamic Performance Glow) ── */}
         <section className="relative mt-4">
-          <div className="bg-ios-dark text-white p-8 rounded-2xl relative overflow-hidden shadow-2xl">
-            {/* Glow effects — Apple blue accent */}
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-hushh-blue/15 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-hushh-blue/5 to-transparent" />
+          <div className={`
+            p-8 rounded-2xl relative overflow-hidden transition-all duration-1000 shadow-2xl
+            ${isMarketPositive 
+              ? 'bg-ios-dark border border-ios-green/30 shadow-[0_0_40px_-10px_rgba(52,199,89,0.3)]' 
+              : 'bg-ios-dark border border-red-500/30 shadow-[0_0_40px_-10px_rgba(239,68,68,0.3)]'}
+          `}>
+            {/* Background Ambient Aura */}
+            <div className={`
+              absolute -top-10 -right-10 w-40 h-40 rounded-full blur-3xl transition-colors duration-1000
+              ${isMarketPositive ? 'bg-ios-green/15' : 'bg-red-500/15'}
+            `} />
+            
+            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/20 to-transparent" />
 
             <div className="relative z-10 flex flex-col gap-6">
               <div className="flex justify-between items-start">
@@ -180,27 +190,36 @@ export default function HomePage() {
                     Flagship Product
                   </span>
                   <h2
-                    className="text-3xl font-medium font-serif"
+                    className="text-3xl font-medium font-serif text-white"
                     style={playfair}
                   >
                     Fund A
                   </h2>
                 </div>
-                <span className="bg-hushh-blue/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider border border-hushh-blue/30 text-hushh-blue">
-                  High Growth
+                <span className={`
+                  backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider border transition-all duration-700
+                  ${isMarketPositive 
+                    ? 'bg-ios-green/20 border-ios-green/30 text-ios-green' 
+                    : 'bg-red-500/20 border-red-500/30 text-red-400'}
+                `}>
+                  {isMarketPositive ? 'Performing' : 'Volatile'}
                 </span>
               </div>
 
               <div className="space-y-4 my-2">
                 <div>
                   <span className="text-xs text-white/50 block mb-1">Target Net IRR</span>
-                  <span className="text-[48px] font-serif font-light tracking-tighter text-ios-green leading-none" style={playfair}>
+                  <span 
+                    className={`text-[48px] font-serif font-light tracking-tighter leading-none block transition-colors duration-1000 
+                    ${isMarketPositive ? 'text-ios-green' : 'text-red-400'}`} 
+                    style={playfair}
+                  >
                     18-23%
                   </span>
                 </div>
                 <div>
                   <span className="text-xs text-white/50 block mb-1">Inception Year</span>
-                  <span className="font-serif text-[36px] leading-none" style={playfair}>2024</span>
+                  <span className="font-serif text-[36px] leading-none text-white" style={playfair}>2024</span>
                 </div>
               </div>
 
@@ -212,10 +231,13 @@ export default function HomePage() {
                 aria-label="View performance details"
                 onKeyDown={(e) => { if (e.key === 'Enter') onNavigate("/discover-fund-a"); }}
               >
-                <span className="text-xs font-medium tracking-wide uppercase text-hushh-blue">
+                <span className={`text-xs font-medium tracking-wide uppercase transition-colors duration-700
+                  ${isMarketPositive ? 'text-hushh-blue' : 'text-red-400'}`}>
                   Performance Details
                 </span>
-                <span className="material-symbols-outlined thin-icon text-sm text-hushh-blue group-hover:translate-x-1 transition-transform">
+                <span className={`material-symbols-outlined thin-icon text-sm transition-all duration-700 
+                  ${isMarketPositive ? 'text-hushh-blue' : 'text-red-400'} 
+                  group-hover:translate-x-1`}>
                   arrow_forward
                 </span>
               </div>
