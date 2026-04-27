@@ -1,11 +1,5 @@
 /**
  * Home Page — All Business Logic
- *
- * Contains:
- * - Auth session management (Supabase)
- * - Onboarding status check
- * - Primary CTA determination
- * - Navigation handler
  */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +32,7 @@ export interface HomeLogic {
   session: Session | null;
   primaryCTA: PrimaryCTA;
   onNavigate: (path: string) => void;
+  isMarketPositive: boolean; // ✨ NEW: Controls the performance glow
 }
 
 /* ─── Main Hook ─── */
@@ -52,6 +47,9 @@ export const useHomeLogic = (): HomeLogic => {
     financialLinkStatus: "pending",
     loading: true,
   });
+
+  // ✨ NEW: Local state to simulate or fetch performance data
+  const [isMarketPositive, setIsMarketPositive] = useState<boolean>(true);
 
   /* Check onboarding status when logged in */
   useEffect(() => {
@@ -144,5 +142,6 @@ export const useHomeLogic = (): HomeLogic => {
     session,
     primaryCTA: getPrimaryCTA(),
     onNavigate,
+    isMarketPositive, // ✨ NEW
   };
 };
