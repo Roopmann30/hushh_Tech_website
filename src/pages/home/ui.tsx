@@ -199,8 +199,8 @@ export default function HomePage() {
                 <span className={`
                   backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider border transition-all duration-700
                   ${isMarketPositive 
-                    ? 'bg-ios-green/20 border-ios-green/30 text-ios-green' 
-                    : 'bg-red-500/20 border-red-500/30 text-red-400'}
+                    ? 'bg-ios-green/20 border-ios-green/30 text-white' 
+                    : 'bg-red-500/20 border-red-500/30 text-white'}
                 `}>
                   {isMarketPositive ? 'Performing' : 'Volatile'}
                 </span>
