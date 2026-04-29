@@ -1,20 +1,11 @@
-/**
- * HushhTechHeader — Fixed header with hamburger menu + stock ticker
- * Always fixed to top of viewport. Includes spacer div to prevent
- * content from hiding behind it.
- *
- * Left: Hushh logo + brand name. Right: hamburger menu button.
- * Below: Scrolling stock ticker with live quotes (Google, Apple, etc.)
- */
 import React, { useState } from "react";
 import hushhLogo from "../images/Hushhogo.png";
 import HushhTechNavDrawer from "../hushh-tech-nav-drawer/HushhTechNavDrawer";
 import { useStockQuotes, StockQuote } from "../../hooks/useStockQuotes";
 
-/* ── Chip-based ticker component — matches Navbar design ── */
+/* ── Chip-based ticker component ── */
 const TickerChip = ({ quote, isLoading }: { quote: StockQuote; isLoading?: boolean }) => (
   <div className="group flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-white border border-gray-200 shadow-sm pl-1.5 pr-3 hover:shadow-md transition-all">
-    {/* Logo circle */}
     <div className="flex w-6 h-6 items-center justify-center rounded-full bg-gray-100 shrink-0 overflow-hidden">
       {quote.logo ? (
         <img
@@ -31,12 +22,10 @@ const TickerChip = ({ quote, isLoading }: { quote: StockQuote; isLoading?: boole
       )}
     </div>
 
-    {/* Symbol */}
     <span className="text-[11px] font-bold text-gray-800 leading-none">
       {quote.displaySymbol}
     </span>
 
-    {/* Change arrow + percent */}
     <div className={`ml-0.5 flex items-center gap-0.5 ${quote.isUp ? "text-green-600" : "text-red-500"}`}>
       <span className="text-[9px]">{quote.isUp ? "▲" : "▼"}</span>
       <span className={`text-[10px] font-semibold ${isLoading ? "animate-pulse" : ""}`}>
@@ -47,9 +36,7 @@ const TickerChip = ({ quote, isLoading }: { quote: StockQuote; isLoading?: boole
 );
 
 interface HushhTechHeaderProps {
-  /** Show the stock ticker strip below header (default: true) */
   showTicker?: boolean;
-  /** Extra classes on the header element */
   className?: string;
 }
 
@@ -64,13 +51,17 @@ const HushhTechHeader: React.FC<HushhTechHeaderProps> = ({
 
   return (
     <>
-      {/* Fixed header — always pinned to top */}
+      {/* 
+          REFACTOR: Header clearance is now contract-driven.
+          Removed the hardcoded div spacer to comply with Shell Contract rules.
+      */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 bg-white shadow-sm ${className}`}
+        style={{ height: 'var(--top-shell-reserved-height)' } as React.CSSProperties}
+        data-speaker-persona="kai"
       >
-        {/* ── Top bar: Logo + Hamburger ── */}
-        <div className="px-6 py-4 flex justify-between items-center">
-          {/* Logo + Brand */}
+        {/* ── Top bar: Aligned to Standard 90rem width ── */}
+        <div className="max-w-[var(--app-shell-standard)] mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
               <img
@@ -89,12 +80,10 @@ const HushhTechHeader: React.FC<HushhTechHeaderProps> = ({
             </div>
           </div>
 
-          {/* Hamburger menu button */}
           <button
             onClick={() => setIsDrawerOpen(true)}
             className="w-10 h-10 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
             aria-label="Open menu"
-            tabIndex={0}
           >
             <span className="material-symbols-outlined text-white !text-[1.2rem]">
               menu
@@ -102,13 +91,12 @@ const HushhTechHeader: React.FC<HushhTechHeaderProps> = ({
           </button>
         </div>
 
-        {/* ── Stock Ticker Strip — below header nav ── */}
+        {/* ── Stock Ticker Strip ── */}
         {showTicker && (
           <section className="relative w-full bg-[#F8F9FA] py-2 border-t border-b border-gray-200">
-            {/* Fade-masked marquee */}
             <div className="hushh-ticker-mask relative flex w-full overflow-hidden">
               <div className="hushh-ticker-track flex items-center gap-2.5 px-3">
-                {/* First set */}
+                {/* Loop sets for seamless scrolling */}
                 {quotes.map((quote, idx) => (
                   <TickerChip
                     key={`a-${quote.symbol}-${idx}`}
@@ -116,7 +104,6 @@ const HushhTechHeader: React.FC<HushhTechHeaderProps> = ({
                     isLoading={quotesLoading && quotes.length === 0}
                   />
                 ))}
-                {/* Duplicate for seamless loop */}
                 {quotes.map((quote, idx) => (
                   <TickerChip
                     key={`b-${quote.symbol}-${idx}`}
@@ -127,7 +114,7 @@ const HushhTechHeader: React.FC<HushhTechHeaderProps> = ({
               </div>
             </div>
 
-            {/* Live indicator dot */}
+            {/* Live indicator */}
             {lastUpdated && (
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -140,11 +127,7 @@ const HushhTechHeader: React.FC<HushhTechHeaderProps> = ({
         )}
       </header>
 
-      {/* Spacer — prevents content from hiding behind the fixed header */}
-      {/* Nav bar ~72px + ticker strip ~49px = ~121px when ticker shown */}
-      <div className={showTicker ? "h-[121px]" : "h-[72px]"} />
-
-      {/* Navigation Drawer */}
+      {/* Nav uses Nav persona for privacy/drawer actions */}
       <HushhTechNavDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
