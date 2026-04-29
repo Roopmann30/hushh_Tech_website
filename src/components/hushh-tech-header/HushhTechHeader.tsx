@@ -63,9 +63,26 @@ const HushhTechHeader: React.FC<HushhTechHeaderProps> = ({
           REFACTOR: Header clearance is now contract-driven.
           Removed the hardcoded div spacer to comply with Shell Contract rules.
       */}
+      // In the component body, add a ref and an effect to track the header's size.
+      const headerRef = useRef<HTMLElement>(null);
+
+      useEffect(() => {
+        const element = headerRef.current;
+        if (!element) return;
+
+        const observer = new ResizeObserver(() => {
+          const { height } = element.getBoundingClientRect();
+          document.documentElement.style.setProperty('--top-shell-reserved-height', `${height}px`);
+        });
+
+        observer.observe(element);
+        return () => observer.disconnect();
+      }, []);
+
+      // In the JSX, remove the fixed style and apply the ref.
       <header
+        ref={headerRef}
         className={`fixed top-0 left-0 right-0 z-50 bg-white shadow-sm ${className}`}
-        style={{ height: 'var(--top-shell-reserved-height)' } as React.CSSProperties}
         data-speaker-persona="kai"
       >
         {/* ── Top bar: Aligned to Standard 90rem width ── */}
