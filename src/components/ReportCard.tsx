@@ -51,8 +51,9 @@ const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
       </Box>
 
       {/* Change Percentage Logic */}
-      <Text color="emerald.400" fontWeight="bold" fontSize="lg" mt={1}>
-        ↗ +$16,126.09 (0.98%)
+      {/* TODO: Replace with dynamic data from the report object, e.g., report.dailyChange */}
+      <Text color={report.dailyChange.isPositive ? "emerald.400" : "red.400"} fontWeight="bold" fontSize="lg" mt={1}>
+        {report.dailyChange.isPositive ? '↗' : '↘'} {report.dailyChange.value} ({report.dailyChange.percentage}%)
       </Text>
 
       <Box mt={6} pt={4} borderTop="1px solid" borderColor="whiteAlpha.100">
