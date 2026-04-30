@@ -1,46 +1,69 @@
-import React from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, Text, Flex, Badge, IconButton } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { Report } from '../services/reportService';
-import { formatShortDate } from '../utils/dateFormatter';
 
 interface ReportCardProps {
   report: Report;
 }
 
 const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
+  const [isHidden, setIsHidden] = useState(false);
+
+  // Fallback values if the report object doesn't have them yet
+  const portfolioValue = report.portfolioValue || "$1,656,064.53";
+  const riskLevel = report.riskLevel || "HIGH";
+
   return (
     <Box
-      key={report.id}
-      mb={6}
-      _hover={{
-        "& > p:last-of-type": {
-          textDecoration: "underline"
-        }
-      }}
+      bg="gray.950"
+      p={8}
+      borderRadius="3xl"
+      border="1px solid"
+      borderColor="whiteAlpha.100"
+      textAlign="center"
+      position="relative"
     >
-      {/* Date in red, bold */}
-      <Text
-        color="red.600"
-        fontWeight="500"
-        fontSize={{ base: "sm", md: "md" }}
-        mb={1}
-      >
-        {formatShortDate(report.date)}
+      <Text fontSize="xs" fontWeight="bold" color="gray.500" mb={4} letterSpacing="widest">
+        TOTAL PORTFOLIO VALUE
       </Text>
-      
-      {/* Title as a link */}
-      <Link to={`/reports/${report.id}`}>
+
+      <Flex justify="center" align="center" gap={3} mb={2}>
+        <Badge variant="outline" colorScheme="red" borderRadius="full" px={3}>
+          RISK: {riskLevel}
+        </Badge>
+        <Badge variant="outline" colorScheme="gray" borderRadius="full" px={3}>
+          HOLDINGS: {report.holdingsCount || 19}
+        </Badge>
+      </Flex>
+
+      <Box cursor="pointer" onClick={() => setIsHidden(!isHidden)}>
         <Text
-          color="gray.900"
-          fontSize={{ base: "md", md: "lg" }}
-          _hover={{ textDecoration: "underline" }}
+          fontSize="5xl"
+          fontWeight="bold"
+          color="white"
+          fontFamily="mono"
+          className={isHidden ? "blur-md" : ""}
+          transition="all 0.3s"
         >
-          {report.title || 'Untitled Report'}
+          {isHidden ? "$ ••••••••" : portfolioValue}
         </Text>
-      </Link>
+      </Box>
+
+      {/* Change Percentage Logic */}
+      <Text color="emerald.400" fontWeight="bold" fontSize="lg" mt={1}>
+        ↗ +$16,126.09 (0.98%)
+      </Text>
+
+      <Box mt={6} pt={4} borderTop="1px solid" borderColor="whiteAlpha.100">
+        <Link to={`/reports/${report.id}`}>
+          <Text color="gray.400" fontSize="sm" _hover={{ color: "white" }}>
+            Current statement period beginning balance: <b>$1,639,938.44</b>
+          </Text>
+        </Link>
+      </Box>
     </Box>
   );
 };
 
-export default ReportCard; 
+export default ReportCard;
