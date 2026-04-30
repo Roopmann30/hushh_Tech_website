@@ -33,7 +33,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
           RISK: {riskLevel}
         </Badge>
         <Badge variant="outline" colorScheme="gray" borderRadius="full" px={3}>
-          HOLDINGS: {report.holdingsCount || 19}
+          HOLDINGS: {report.holdingsCount ?? 0}
         </Badge>
       </Flex>
 
