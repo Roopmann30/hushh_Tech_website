@@ -59,7 +59,8 @@ const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
       <Box mt={6} pt={4} borderTop="1px solid" borderColor="whiteAlpha.100">
         <Link to={`/reports/${report.id}`}>
           <Text color="gray.400" fontSize="sm" _hover={{ color: "white" }}>
-            Current statement period beginning balance: <b>$1,639,938.44</b>
+            {/* Assuming a property like 'beginningBalance' exists on the report object */}
+            Current statement period beginning balance: <b>{report.beginningBalance ?? 'N/A'}</b>
           </Text>
         </Link>
       </Box>
