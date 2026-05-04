@@ -181,6 +181,11 @@ export function useStockQuotes(refreshInterval = 120000) {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchAllQuotes = useCallback(async () => {
+    if (!SUPABASE_URL || SUPABASE_URL.includes('dummy')) {
+    setLoading(false);
+    setError(null);
+    return;
+  }
     try {
       setError(null);
 

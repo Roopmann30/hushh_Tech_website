@@ -29,7 +29,7 @@ export default function HomePage() {
   const { session, primaryCTA, onNavigate } = useHomeLogic();
 
   return (
-    <div
+    <div 
       data-page="home"
       className="bg-white antialiased text-gray-900 min-h-screen flex flex-col relative selection:bg-hushh-blue selection:text-white"
     >

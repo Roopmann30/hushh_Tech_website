@@ -88,7 +88,10 @@ export default function WalletCardPreviewModal({
   googleWalletSupportMessage,
   onAddToGoogleWallet,
   isGooglePassLoading = false,
-}: WalletCardPreviewModalProps) {
+}: WalletCardPreviewModalProps)
+{
+
+ 
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [reducedMotion, setReducedMotion] = useState(false);
   const [supportsInteractiveTilt, setSupportsInteractiveTilt] = useState(false);

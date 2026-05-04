@@ -68,10 +68,23 @@ export function clearLegacyAuthStorage() {
     return;
   }
 
-  LEGACY_AUTH_STORAGE_KEYS.forEach((key) => {
+LEGACY_AUTH_STORAGE_KEYS.forEach((key) => {
+  if (
+    typeof window !== "undefined" &&
+    window.localStorage &&
+    typeof window.localStorage.removeItem === "function"
+  ) {
     window.localStorage.removeItem(key);
+  }
+
+  if (
+    typeof window !== "undefined" &&
+    window.sessionStorage &&
+    typeof window.sessionStorage.removeItem === "function"
+  ) {
     window.sessionStorage.removeItem(key);
-  });
+  }
+});
 }
 
 export function buildOAuthRedirectTo(
