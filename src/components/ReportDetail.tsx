@@ -21,14 +21,26 @@ interface ReportDetailProps {
 const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
   const toast = useToast()
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href)
-    toast({
-      title: 'Link copied.',
-      status: 'success',
-      duration: 2000,
-      isClosable: true,
-    })
+  // UPDATED: Async function with try/catch to satisfy CI compliance
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      toast({
+        title: 'Link copied.',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      })
+    } catch (error) {
+      console.error('Failed to copy:', error)
+      toast({
+        title: 'Failed to copy link.',
+        description: 'Please copy the URL from your browser address bar.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    }
   }
 
   if (isLoading) {
@@ -84,7 +96,6 @@ const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
         </Text>
       )}
 
-      {/* FIX: Using public_image_urls for both check and map */}
       {report.public_image_urls && report.public_image_urls.length > 0 && (
         <Box mb={8}>
           <Heading as="h3" size="md" mb={4}>
@@ -108,7 +119,6 @@ const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
         </Box>
       )}
 
-      {/* FIX: Using public_video_urls for both check and map */}
       {report.public_video_urls && report.public_video_urls.length > 0 && (
         <Box mb={8}>
           <Heading as="h3" size="md" mb={4}>
