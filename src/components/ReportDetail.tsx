@@ -1,4 +1,3 @@
-// src/components/ReportDetail.tsx
 import React from 'react'
 import {
   Box,
@@ -7,9 +6,12 @@ import {
   SimpleGrid,
   Spinner,
   AspectRatio,
+  Button,
+  useToast,
+  Flex,
 } from '@chakra-ui/react'
+import { Link as RouterLink } from 'react-router-dom'
 import { Report } from '../services/reportService'
-// import { formatLongDate } from '../utils/dateFormatter'
 
 interface ReportDetailProps {
   report: Report | null
@@ -17,6 +19,18 @@ interface ReportDetailProps {
 }
 
 const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
+  const toast = useToast()
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href)
+    toast({
+      title: 'Link copied.',
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    })
+  }
+
   if (isLoading) {
     return (
       <Box textAlign="center" py={8}>
@@ -35,14 +49,30 @@ const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
 
   return (
     <Box>
+      <Flex justifyContent="space-between" alignItems="center" mb={6}>
+        <Button
+          as={RouterLink}
+          to="/reports"
+          variant="ghost"
+          size="sm"
+        >
+          ← Back to Reports
+        </Button>
+        <Button size="sm" onClick={handleCopyLink} variant="outline">
+          Share
+        </Button>
+      </Flex>
+
       <Heading as="h1" size="xl" mb={2}>
         {report.title}
       </Heading>
+
       {report.subtitle && (
         <Heading as="h2" size="md" fontWeight="normal" mb={4}>
           {report.subtitle}
         </Heading>
       )}
+
       <Text fontSize="sm" color="gray.600" mb={6}>
         {report.date}
         {report.time && ` at ${report.time}`}
@@ -54,13 +84,14 @@ const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
         </Text>
       )}
 
-      {report.public_image_urls.length > 0 && (
+      {/* FIX: Using public_image_urls for both check and map */}
+      {report.public_image_urls && report.public_image_urls.length > 0 && (
         <Box mb={8}>
           <Heading as="h3" size="md" mb={4}>
             Charts & Data
           </Heading>
           <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={4}>
-            {report.image_urls.map((src, i) => (
+            {report.public_image_urls.map((src, i) => (
               <img
                 key={i}
                 src={src}
@@ -69,7 +100,7 @@ const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
                   width: '100%',
                   height: '400px',
                   objectFit: 'cover',
-                  borderRadius: 'md'
+                  borderRadius: '8px'
                 }}
               />
             ))}
@@ -77,13 +108,14 @@ const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
         </Box>
       )}
 
-      {report.public_video_urls.length > 0 && (
+      {/* FIX: Using public_video_urls for both check and map */}
+      {report.public_video_urls && report.public_video_urls.length > 0 && (
         <Box mb={8}>
           <Heading as="h3" size="md" mb={4}>
             Related Videos
           </Heading>
           <SimpleGrid columns={{ base: 1, md: report.public_video_urls.length > 1 ? 2 : 1 }} spacing={4}>
-            {report.video_urls.map((src, i) => (
+            {report.public_video_urls.map((src, i) => (
               <AspectRatio key={i} ratio={16 / 9} borderRadius="md" overflow="hidden">
                 <video src={src} controls style={{ width: '100%', height: '100%' }} />
               </AspectRatio>
