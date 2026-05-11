@@ -194,6 +194,7 @@ export default function WalletCardPreviewModal({
       >
         <ModalHeader display="none" />
         <ModalCloseButton
+          aria-label="Close wallet preview"
           top={4}
           right={4}
           w={10}
