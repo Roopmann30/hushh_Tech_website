@@ -13,25 +13,19 @@ const clampProgress = (value?: number | null) => {
 
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
-  ProgressProps
->(({ className, value, indicatorClassName = '', ...props }, ref) => {
-  const safeValue = clampProgress(value);
+  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
+>(({ className, value, ...props }, ref) => (
+  <ProgressPrimitive.Root
+    ref={ref}
+    className={cn("relative h-4 w-full overflow-hidden rounded-full bg-secondary", className)}
+    {...props}
+  >
+    <ProgressPrimitive.Indicator
+      className="h-full w-full flex-1 bg-primary transition-all duration-500 ease-in-out"
+      style={{ transform: `translateX(-${100 - Math.min(Math.max(value || 0, 0), 100)}%)` }}
+    />
+  </ProgressPrimitive.Root>
+))
+Progress.displayName = ProgressPrimitive.Root.displayName
 
-  return (
-    <ProgressPrimitive.Root
-      ref={ref}
-      value={safeValue}
-      className={cn('relative h-2 w-full overflow-hidden rounded-full bg-slate-100', className)}
-      {...props}
-    >
-      <ProgressPrimitive.Indicator
-        className={`h-full w-full flex-1 transition-transform duration-500 ease-out ${indicatorClassName}`}
-        style={{ transform: `translateX(-${100 - safeValue}%)` }}
-      />
-    </ProgressPrimitive.Root>
-  );
-});
-
-Progress.displayName = ProgressPrimitive.Root.displayName;
-
-export { Progress };
+export { Progress }
