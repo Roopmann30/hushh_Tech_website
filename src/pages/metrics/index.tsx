@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type AnchorHTMLAttributes,
+  type ReactNode,
+} from "react";
 import { Helmet } from "react-helmet";
 import {
   Bar,
@@ -149,6 +155,38 @@ function buildLookerStudioLink(rawUrl?: string) {
   }
 }
 
+export function AnalyticsToolbar({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+      {children}
+    </div>
+  );
+}
+
+export function AnalyticsToolbarLink({
+  className = "",
+  children,
+  ...props
+}: AnchorHTMLAttributes<HTMLAnchorElement>) {
+  const classes = [
+    "inline-flex min-h-10 w-full items-center justify-center whitespace-nowrap",
+    "rounded-full border border-black bg-black px-5 py-2 text-sm font-medium leading-none text-white",
+    "transition hover:bg-transparent hover:text-black sm:w-auto",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <a
+      {...props}
+      className={classes}
+    >
+      {children}
+    </a>
+  );
+}
+
 export function MetricCard({
   eyebrow,
   label,
@@ -219,6 +257,26 @@ function SummaryCell({
         {value}
       </p>
     </div>
+  );
+}
+
+export function DashboardStatusBadge({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: string;
+  className: string;
+}) {
+  return (
+    <span
+      role="status"
+      aria-label={`${label}: ${value}`}
+      className={`inline-flex rounded-full px-3 py-1 text-[10px] font-semibold uppercase ${className}`.trim()}
+    >
+      {value}
+    </span>
   );
 }
 
@@ -597,8 +655,10 @@ export default function MetricsPage() {
                     From signup to confirmation
                   </h2>
                 </div>
-                <span
-                  className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${
+                <DashboardStatusBadge
+                  label="Funnel stack status"
+                  value={statusLabel}
+                  className={`tracking-[0.2em] ${
                     statusLabel === "Issue"
                       ? "bg-red-400/20 text-red-200"
                       : statusLabel === "Cached"
@@ -607,9 +667,7 @@ export default function MetricsPage() {
                           ? "bg-white/10 text-white/70"
                           : "bg-emerald-400/15 text-emerald-200"
                   }`}
-                >
-                  {statusLabel}
-                </span>
+                />
               </div>
 
               <div className="mt-6 space-y-4">
@@ -965,7 +1023,7 @@ export default function MetricsPage() {
           </section>
 
           <section className="rounded-[2rem] border border-[#e8dfcb] bg-[#fffaf0] p-6 shadow-sm">
-            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#244d86]">
                   Traffic context
@@ -976,14 +1034,15 @@ export default function MetricsPage() {
               </div>
 
               {lookerStudioLink && (
-                <a
-                  href={lookerStudioLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-full border border-black bg-black px-5 py-2 text-sm font-medium text-white transition hover:bg-transparent hover:text-black"
-                >
-                  Open Looker traffic view
-                </a>
+                <AnalyticsToolbar>
+                  <AnalyticsToolbarLink
+                    href={lookerStudioLink}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open Looker traffic view
+                  </AnalyticsToolbarLink>
+                </AnalyticsToolbar>
                 )}
             </div>
 
@@ -1217,9 +1276,11 @@ export default function MetricsPage() {
                       Separate hushh-api flow
                     </h2>
                   </div>
-                  <div className="rounded-full border border-[#e8dfcb] bg-[#faf5ea] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6f684f]">
-                    Not merged
-                  </div>
+                  <DashboardStatusBadge
+                    label="Legacy appendix status"
+                    value="Not merged"
+                    className="border border-[#e8dfcb] bg-[#faf5ea] tracking-[0.18em] text-[#6f684f]"
+                  />
                 </div>
 
                 <div className="mt-6 rounded-2xl border border-[#ece4d2] bg-[#faf5ea] px-4 py-4">
@@ -1250,9 +1311,11 @@ export default function MetricsPage() {
                         Runtime warnings
                       </h2>
                     </div>
-                    <div className="rounded-full border border-amber-200 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-800">
-                      {warnings.length} note{warnings.length === 1 ? "" : "s"}
-                    </div>
+                    <DashboardStatusBadge
+                      label="Audit notes status"
+                      value={`${warnings.length} note${warnings.length === 1 ? "" : "s"}`}
+                      className="border border-amber-200 bg-white/70 tracking-[0.18em] text-amber-800"
+                    />
                   </div>
 
                   <div className="mt-5 grid gap-3">
