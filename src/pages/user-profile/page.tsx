@@ -10,13 +10,12 @@ import {
   FormLabel,
   Input,
   VStack,
-  HStack,
   Flex,
   Icon,
   SimpleGrid,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { FiFileText, FiEdit3 } from "react-icons/fi"; // Using FiEdit3 for a slightly different edit icon
+import { FiFileText, FiEdit3 } from "react-icons/fi";
 
 const UserProfilePage = () => {
   const cardBg = useColorModeValue("white", "gray.700");
@@ -35,7 +34,7 @@ const UserProfilePage = () => {
           </Text>
         </Heading>
         <Text fontSize={{ base: "md", md: "lg" }} color={subTextColor} textAlign="center">
-          Manage your personal information and account settings.
+          Manage your personal information and account settings
         </Text>
       </VStack>
 
@@ -59,6 +58,7 @@ const UserProfilePage = () => {
               color="white"
               _hover={{ bg: "yellow.500" }}
               leftIcon={<Icon as={FiEdit3} />}
+              aria-label="Edit profile information"
             >
               Edit
             </Button>
@@ -66,11 +66,27 @@ const UserProfilePage = () => {
           <VStack spacing={5} align="stretch">
             <FormControl id="fullName">
               <FormLabel color={textColor} fontWeight="medium">Full Name</FormLabel>
-              <Input type="text" placeholder="Your full name" isReadOnly value="John Doe" borderColor={borderColor} _readOnly={{ bg: "gray.50", cursor: "default" }}/>
+              <Input
+                type="text"
+                placeholder="Your full name"
+                isReadOnly
+                value="John Doe"
+                borderColor={borderColor}
+                _readOnly={{ bg: "gray.50", cursor: "default" }}
+                aria-readonly="true"
+              />
             </FormControl>
             <FormControl id="emailAddress">
-              <FormLabel color={textColor} fontWeight="medium">Email Address</FormLabel>
-              <Input type="email" placeholder="Your email address" isReadOnly value="john.doe@example.com" borderColor={borderColor} _readOnly={{ bg: "gray.50", cursor: "default" }} />
+              <FormLabel color={textColor} fontWeight="medium">EmailAddress</FormLabel>
+              <Input
+                type="email"
+                placeholder="Your email address"
+                isReadOnly
+                value="john.doe@example.com"
+                borderColor={borderColor}
+                _readOnly={{ bg: "gray.50", cursor: "default" }}
+                aria-readonly="true"
+              />
             </FormControl>
           </VStack>
         </Box>
@@ -127,17 +143,16 @@ const UserProfilePage = () => {
         <Heading as="h2" size="lg" fontWeight="medium" color={headingColor} mb={6}>
           NDA Information
         </Heading>
-        <VStack spacing={4}>
+        <VStack spacing={4} maxW="md" mx="auto">
           <Icon as={FiFileText} w={16} h={16} color="cyan.500" />
           <Text color={subTextColor} fontSize="md">
             You haven't submitted an NDA application yet.
           </Text>
-          {/* Optionally, add a button to navigate to the NDA form */}
-          {/* <Button colorScheme="cyan" variant="outline" mt={2}>Submit NDA</Button> */}
         </VStack>
       </Box>
     </Container>
   );
 };
+
 
 export default UserProfilePage;
