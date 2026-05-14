@@ -91,7 +91,18 @@ const DeleteAccountPage: React.FC = () => {
 
             {/* ── Primary CTA ── */}
             <div className="mb-16">
-              {isLoggedIn ? (
+              {isLoading ? (
+                <HushhTechCta
+                  variant={HushhTechCtaVariant.BLACK}
+                  disabled
+                  className="opacity-60 cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
+                    Verifying Session...
+                  </div>
+                </HushhTechCta>
+              ) : isLoggedIn ? (
                 <HushhTechCta
                   variant={HushhTechCtaVariant.BLACK}
                   onClick={onOpen}
@@ -124,9 +135,9 @@ const DeleteAccountPage: React.FC = () => {
                       aria-controls={`accordion-${section.id}`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-white group-hover:border-gray-200 border border-transparent transition-all shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-white group-hover:border-gray-200 group-hover:shadow-sm border border-transparent transition-all shrink-0">
                           <span
-                            className={`material-symbols-outlined ${section.iconColor} text-[1.25rem]`}
+                            className={`material-symbols-outlined ${section.iconColor} text-[1.25rem] group-hover:scale-110 transition-transform`}
                             style={{
                               fontVariationSettings:
                                 "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24",
