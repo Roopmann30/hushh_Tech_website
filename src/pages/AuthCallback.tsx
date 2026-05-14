@@ -1,6 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Box, Container, Heading, Text, Spinner, Button, Flex, Icon, Alert, AlertIcon } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Heading,
+  Text,
+  Spinner,
+  Button,
+  Flex,
+  Icon,
+  Alert,
+  AlertIcon
+} from '@chakra-ui/react';
 import { CheckCircle, AlertTriangle } from 'lucide-react';
 import config from '../resources/config/config';
 import { DEFAULT_AUTH_REDIRECT, sanitizeInternalRedirect } from '../utils/security';
@@ -10,7 +21,6 @@ import {
   normalizeLegacyOnboardingRedirectTarget,
 } from '../services/onboarding/flow';
 
-
 const AuthCallback: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -18,19 +28,19 @@ const AuthCallback: React.FC = () => {
   const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
+  // Guard to prevent double-execution in React Strict Mode or rapid re-renders
+  const processingStarted = useRef(false);
+
   // Get custom redirect from URL param (for Hushh AI and other modules)
   const redirectParam = searchParams.get('redirect');
   const customRedirect = redirectParam
     ? normalizeLegacyOnboardingRedirectTarget(
-        sanitizeInternalRedirect(redirectParam, DEFAULT_AUTH_REDIRECT)
-      )
+      sanitizeInternalRedirect(redirectParam, DEFAULT_AUTH_REDIRECT)
+    )
     : null;
 
-  // Helper to determine final redirect destination
   const getRedirectDestination = (hasCompletedOnboarding: boolean) => {
-    // If custom redirect is set (e.g., /hushh-ai), use it
     if (customRedirect) return customRedirect;
-    // Otherwise, default behavior: onboarding or profile
     return hasCompletedOnboarding ? '/hushh-user-profile' : FINANCIAL_LINK_ROUTE;
   };
 
@@ -38,130 +48,109 @@ const AuthCallback: React.FC = () => {
     sessionStorage.setItem('showWelcomeToast', 'true');
     if (userId) {
       sessionStorage.setItem('showWelcomeToastUserId', userId);
-      return;
+    } else {
+      sessionStorage.removeItem('showWelcomeToastUserId');
     }
-    sessionStorage.removeItem('showWelcomeToastUserId');
   };
 
   useEffect(() => {
-    const handleEmailVerification = async () => {
+    // Fail-fast if processing is already underway
+    if (processingStarted.current) return;
+    processingStarted.current = true;
+
+    const handleAuthCallback = async () => {
       try {
         const supabase = config.supabaseClient;
         if (!supabase) {
-          setVerificationStatus('error');
-          setErrorMessage('Configuration error');
-          console.error('[Hushh][AuthCallback] Supabase client missing - cannot restore session');
-          return;
+          throw new Error('Supabase configuration missing');
         }
 
-        // Always clear stale toast flags; set again only on successful auth restore.
+        // Clear stale toast flags before processing
         sessionStorage.removeItem('showWelcomeToast');
         sessionStorage.removeItem('showWelcomeToastUserId');
 
-        // Check for any type and error from the URL
-        const type = searchParams.get('type');
+        const code = searchParams.get('code');
         const error = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
-        const code = searchParams.get('code');
-        console.info('[Hushh][AuthCallback] Callback hit', { type, hasCode: !!code, hasError: !!error, customRedirect });
 
-        // If there's an error, display it
         if (error) {
-          setVerificationStatus('error');
-          setErrorMessage(errorDescription || 'An error occurred during verification');
-          console.error('[Hushh][AuthCallback] OAuth error', { error, errorDescription });
-          return;
+          throw new Error(errorDescription || 'An error occurred during verification');
         }
 
-        // Always exchange an OAuth code when present. A stale cached session must not
-        // block the new Apple/Google identity from becoming the active session.
+        // 1. Exchange Code for Session with Retry Logic
         if (code) {
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          if (exchangeError) {
-            setVerificationStatus('error');
-            setErrorMessage(exchangeError.message);
-            console.error('[Hushh][AuthCallback] Code exchange failed', exchangeError);
-            return;
-          }
-          console.info('[Hushh][AuthCallback] Code exchange succeeded, session created');
+          let retryCount = 0;
+          const maxRetries = 2;
 
-          // Clean the URL to avoid re-exchanging the same code on refresh
+          const exchangeWithRetry = async (): Promise<void> => {
+            const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+            if (exchangeError) {
+              if (retryCount < maxRetries) {
+                retryCount++;
+                console.warn(`[Hushh] Exchange failed, retrying (${retryCount})...`);
+                await new Promise(res => setTimeout(res, 1000 * retryCount)); // Exponential backoff
+                return exchangeWithRetry();
+              }
+              throw exchangeError;
+            }
+          };
+
+          await exchangeWithRetry();
+
+          // Standardize: Clean URL to prevent re-exchanging same code on refresh
           const cleanUrl = window.location.origin + window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
         }
 
-        // If it's a signup confirmation
+        // 2. Handle Signup Legacy Tokens
+        const type = searchParams.get('type');
         if (type === 'signup') {
-          // Get the access token and refresh token from the URL
           const accessToken = searchParams.get('access_token');
           const refreshToken = searchParams.get('refresh_token');
 
-          if (!accessToken || !refreshToken) {
-            setVerificationStatus('error');
-            setErrorMessage('Missing authentication tokens');
-            console.error('[Hushh][AuthCallback] Missing tokens in signup callback');
-            return;
-          }
-
-          // Set the session with Supabase
-          const { error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken
-          });
-
-          if (error) {
-            setVerificationStatus('error');
-            setErrorMessage(error.message);
-            console.error('[Hushh][AuthCallback] setSession failed', error);
-            return;
+          if (accessToken && refreshToken) {
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken
+            });
+            if (sessionError) throw sessionError;
           }
         }
 
+        // 3. Revalidate Global Auth Context
         const sessionSnapshot = await revalidateSession();
 
         if (sessionSnapshot.status !== 'authenticated' || !sessionSnapshot.user) {
-          setVerificationStatus('error');
-          setErrorMessage('No active session found. Please try signing in again.');
-          console.error('[Hushh][AuthCallback] No valid session after callback', sessionSnapshot);
-          return;
+          throw new Error('No active session found. Please try signing in again.');
         }
 
-        const user = sessionSnapshot.user;
-        const { data: onboardingData } = await supabase
+        // 4. Check Onboarding Status
+        const { data: onboardingData, error: dbError } = await supabase
           .from('onboarding_data')
-          .select('is_completed, current_step')
-          .eq('user_id', user.id)
+          .select('is_completed')
+          .eq('user_id', sessionSnapshot.user.id)
           .maybeSingle();
 
-        console.info('[Hushh][AuthCallback] Session restored', {
-          userId: user.id,
-          email: user.email,
-          onboardingFound: !!onboardingData,
-        });
+        if (dbError) console.error('[Hushh] Onboarding check failed', dbError);
 
-        queueWelcomeToast(user.id);
+        queueWelcomeToast(sessionSnapshot.user.id);
         setVerificationStatus('success');
+
+        // Smooth transition timing to match Profile Page entry animations
         setTimeout(() => {
           const hasCompletedOnboarding = onboardingData?.is_completed ?? false;
           navigate(getRedirectDestination(hasCompletedOnboarding));
         }, 1200);
-      } catch (err) {
-        console.error('Verification error:', err);
+
+      } catch (err: any) {
+        console.error('[Hushh][AuthCallback] Error:', err);
         setVerificationStatus('error');
-        setErrorMessage('An unexpected error occurred');
+        setErrorMessage(err.message || 'An unexpected error occurred');
       }
     };
 
-    handleEmailVerification();
+    handleAuthCallback();
   }, [searchParams, navigate, revalidateSession]);
-
-  const redirectToLogin = () => {
-    navigate('/login');
-  };
-
-  const redirectToHome = () => {
-    navigate('/');
-  };
 
   return (
     <Container maxW="container.md" py={12}>
@@ -177,7 +166,7 @@ const AuthCallback: React.FC = () => {
           <Flex direction="column" align="center" py={10}>
             <Spinner size="xl" color="#0AADBC" thickness="4px" speed="0.65s" mb={6} />
             <Heading size="lg" mb={4}>Verifying your email...</Heading>
-            <Text color="gray.600">Please wait while we confirm your email address.</Text>
+            <Text color="gray.600">Please wait while we confirm your identity.</Text>
           </Flex>
         )}
 
@@ -186,24 +175,8 @@ const AuthCallback: React.FC = () => {
             <Icon as={CheckCircle} w={16} h={16} color="green.500" mb={6} />
             <Heading size="lg" mb={4}>Welcome to HushhTech!</Heading>
             <Text color="gray.600" mb={8}>
-              Your email has been successfully verified. You can now set up your profile and start exploring the community.
+              Your email has been verified. Redirecting you to your dashboard...
             </Text>
-            <Flex gap={4}>
-              <Button
-                colorScheme="green"
-                size="lg"
-                onClick={() => navigate('/user-registration')}
-              >
-                Set us your profile
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => navigate('/community')}
-              >
-                Checkout communnity posts
-              </Button>
-            </Flex>
           </Flex>
         )}
 
@@ -211,23 +184,15 @@ const AuthCallback: React.FC = () => {
           <Flex direction="column" align="center" py={6}>
             <Icon as={AlertTriangle} w={16} h={16} color="red.500" mb={6} />
             <Heading size="lg" mb={4}>Verification Failed</Heading>
-            <Alert status="error" mb={6}>
+            <Alert status="error" mb={6} borderRadius="md">
               <AlertIcon />
-              {errorMessage || 'There was an error verifying your email. Please try again.'}
+              {errorMessage}
             </Alert>
             <Flex gap={4}>
-              <Button
-                colorScheme="blue"
-                size="lg"
-                onClick={redirectToLogin}
-              >
+              <Button colorScheme="blue" size="lg" onClick={() => navigate('/login')}>
                 Try Logging In
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={redirectToHome}
-              >
+              <Button variant="outline" size="lg" onClick={() => navigate('/')}>
                 Go to Home
               </Button>
             </Flex>
