@@ -1,17 +1,17 @@
+import React, { useState, useMemo } from 'react';
 import { Link, Routes, Route, useLocation } from 'react-router-dom';
 import { careers } from '../../data/career';
 import JobDetails from './JobDetails';
 import './Career.css';
-import { 
-  Container, 
-  Box, 
-  Heading, 
-  Text, 
-  VStack, 
-  HStack, 
-  Icon, 
-  Flex, 
-  Divider, 
+import {
+  Container,
+  Box,
+  Heading,
+  Text,
+  VStack,
+  HStack,
+  Icon,
+  Flex,
   SimpleGrid,
   Button,
   Input,
@@ -19,14 +19,29 @@ import {
   InputLeftElement,
   Tag,
   TagLabel,
-  TagLeftIcon,
-  AnimatePresence
 } from "@chakra-ui/react";
-import { MapPin, Clock, ChevronRight, Rocket, DollarSign, Star, Search, Filter } from "lucide-react";
-import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import {
+  MapPin,
+  Clock,
+  ChevronRight,
+  Rocket,
+  DollarSign,
+  Star,
+  Search,
+  Filter
+} from "lucide-react";
+// FIX: AnimatePresence and motion must be imported from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion';
 
 const MotionBox = motion(Box);
+
+// Interface to prevent "any" type errors during mapping
+interface Job {
+  id: string;
+  title: string;
+  location: string;
+  department?: string;
+}
 
 const CareerList = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,15 +50,15 @@ const CareerList = () => {
   const departments = useMemo(() => ['All', ...Object.keys(careers)], []);
 
   const filteredCareers = useMemo(() => {
-    const result: any = {};
+    const result: Record<string, Job[]> = {};
     Object.entries(careers).forEach(([dept, jobs]) => {
       if (selectedDept !== 'All' && dept !== selectedDept) return;
-      
-      const filteredJobs = jobs.filter(job => 
+
+      const filteredJobs = (jobs as Job[]).filter(job =>
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.location.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      
+
       if (filteredJobs.length > 0) {
         result[dept] = filteredJobs;
       }
@@ -53,11 +68,11 @@ const CareerList = () => {
 
   return (
     <Container maxW="container.xl" px={{ base: 4, md: 8 }} py={10}>
-      {/* Main Header */}
-      <Flex 
+      {/* Hero Section */}
+      <Flex
         direction="column"
         align="center"
-        justify="center" 
+        justify="center"
         minHeight="60vh"
         textAlign="center"
         mb={12}
@@ -67,14 +82,9 @@ const CareerList = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Heading 
-            as="h1" 
-            lineHeight="1.1"
-            fontWeight="600"
-            mb={6}
-          >
-            <Text 
-              as="span" 
+          <Heading as="h1" lineHeight="1.1" fontWeight="600" mb={6}>
+            <Text
+              as="span"
               bgGradient="linear(to-r, #00A9E0, #6DD3EF)"
               bgClip="text"
               fontSize={{ base: "5xl", md: "8xl" }}
@@ -83,8 +93,8 @@ const CareerList = () => {
               Hushh Careers
             </Text>
             <br />
-            <Text 
-              as="span" 
+            <Text
+              as="span"
               color="gray.900"
               fontSize={{ base: "4xl", md: "7xl" }}
               letterSpacing="-0.03em"
@@ -93,30 +103,29 @@ const CareerList = () => {
               Shape the Future of AI
             </Text>
           </Heading>
-          
-          <Text 
-            fontSize={{ base: "lg", md: "2xl" }} 
-            maxW="3xl" 
-            mx="auto" 
+
+          <Text
+            fontSize={{ base: "lg", md: "2xl" }}
+            maxW="3xl"
+            mx="auto"
             color="gray.500"
             lineHeight="1.6"
-            fontWeight="400"
           >
-            We're building the next generation of investment intelligence. 
+            We're building the next generation of investment intelligence.
             Join a team of world-class engineers, quants, and visionaries.
           </Text>
         </MotionBox>
       </Flex>
 
-      {/* Search and Filter Section */}
+      {/* Search & Filter */}
       <Box mb={16} maxW="container.lg" mx="auto">
         <VStack spacing={8}>
           <InputGroup size="lg" maxW="2xl" boxShadow="xl" borderRadius="2xl">
             <InputLeftElement pointerEvents="none" h="full" pl={4}>
               <Icon as={Search} color="gray.400" boxSize={5} />
             </InputLeftElement>
-            <Input 
-              placeholder="Search roles or locations..." 
+            <Input
+              placeholder="Search roles or locations..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               bg="white"
@@ -139,7 +148,6 @@ const CareerList = () => {
                 onClick={() => setSelectedDept(dept)}
                 borderRadius="full"
                 px={6}
-                fontSize="xs"
                 textTransform="uppercase"
                 letterSpacing="wider"
                 _hover={{ transform: "translateY(-1px)" }}
@@ -151,15 +159,16 @@ const CareerList = () => {
         </VStack>
       </Box>
 
-      {/* Career Departments */}
+      {/* Job Listings */}
       <VStack spacing={16} align="stretch" maxW="container.lg" mx="auto">
         <AnimatePresence mode="popLayout">
           {Object.entries(filteredCareers).map(([department, jobs], index) => (
-            <MotionBox 
+            <MotionBox
               key={department}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ delay: index * 0.05 }}
               layout
             >
               <HStack mb={6} justify="space-between" align="center">
@@ -170,20 +179,21 @@ const CareerList = () => {
                   <TagLabel fontWeight="bold">{jobs.length} Positions</TagLabel>
                 </Tag>
               </HStack>
-              
+
               <VStack spacing={4} align="stretch">
                 {jobs.map((job) => (
-                  <MotionBox 
-                    key={job.id} 
-                    as={Link} 
+                  <MotionBox
+                    key={job.id}
+                    as={Link}
                     to={`/career/${job.id}`}
+                    role="group"
                     p={8}
                     bg="white"
                     borderRadius="2xl"
                     boxShadow="sm"
                     borderWidth="1px"
                     borderColor="gray.100"
-                    _hover={{ 
+                    _hover={{
                       boxShadow: "2xl",
                       borderColor: "cyan.100",
                       transform: "scale(1.01)",
@@ -207,12 +217,13 @@ const CareerList = () => {
                           </HStack>
                         </HStack>
                       </Box>
-                      <Box 
-                        bg="gray.50" 
-                        p={2} 
-                        borderRadius="full" 
+                      <Box
+                        bg="gray.50"
+                        p={2}
+                        borderRadius="full"
                         color="gray.400"
                         _groupHover={{ color: "cyan.500", bg: "cyan.50" }}
+                        transition="all 0.2s"
                       >
                         <Icon as={ChevronRight} boxSize={6} />
                       </Box>
@@ -227,113 +238,47 @@ const CareerList = () => {
         {Object.keys(filteredCareers).length === 0 && (
           <Flex direction="column" align="center" py={20} textAlign="center">
             <Icon as={Filter} boxSize={12} color="gray.200" mb={4} />
-            <Text fontSize="xl" color="gray.500">No positions found matching your criteria.</Text>
-            <Button mt={4} variant="link" colorScheme="cyan" onClick={() => {setSearchTerm(''); setSelectedDept('All');}}>
-              Clear all filters
+            <Text fontSize="xl" color="gray.500">No positions found.</Text>
+            <Button mt={4} variant="link" colorScheme="cyan" onClick={() => { setSearchTerm(''); setSelectedDept('All'); }}>
+              Clear filters
             </Button>
           </Flex>
         )}
       </VStack>
 
-      {/* Why Work at Hushh Technologies? Section */}
+      {/* Benefits Grid */}
       <Box mt={24} mb={16}>
-        <Heading 
-          as="h2" 
-          fontSize="3xl"
-          color="gray.800" 
-          mb={16} 
-          textAlign="center"
-          fontWeight="500"
-          letterSpacing="-0.01em"
-        >
+        <Heading as="h2" fontSize="3xl" color="gray.800" mb={16} textAlign="center">
           Why Work at Hushh Technologies?
         </Heading>
 
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={12} maxW="container.lg" mx="auto">
-          {/* Benefit 1 */}
           <Box textAlign="center">
-            <Flex 
-              justifyContent="center" 
-              alignItems="center" 
-              mb={5}
-            >
+            <Flex justifyContent="center" mb={5}>
               <Icon as={Rocket} boxSize={12} color="#FF7171" />
             </Flex>
-            <Heading 
-              as="h3" 
-              fontSize="xl"
-              color="gray.800" 
-              mb={3}
-              fontWeight="500"
-            >
-              Cutting-Edge Technology
-            </Heading>
-            <Text 
-              color="gray.600"
-              fontSize="md"
-              lineHeight="tall"
-            >
-              Work with the latest AI and machine learning technologies
-            </Text>
+            <Heading as="h3" fontSize="xl" mb={3}>Cutting-Edge Tech</Heading>
+            <Text color="gray.600">Work with the latest AI and ML technologies.</Text>
           </Box>
 
-          {/* Benefit 2 */}
           <Box textAlign="center">
-            <Flex 
-              justifyContent="center" 
-              alignItems="center" 
-              mb={5}
-            >
+            <Flex justifyContent="center" mb={5}>
               <Icon as={DollarSign} boxSize={12} color="#F8B76B" />
             </Flex>
-            <Heading 
-              as="h3" 
-              fontSize="xl"
-              color="gray.800" 
-              mb={3}
-              fontWeight="500"
-            >
-              Competitive Compensation
-            </Heading>
-            <Text 
-              color="gray.600"
-              fontSize="md"
-              lineHeight="tall"
-            >
-              Top-tier salaries, equity, and comprehensive benefits
-            </Text>
+            <Heading as="h3" fontSize="xl" mb={3}>Competitive Pay</Heading>
+            <Text color="gray.600">Top-tier salaries, equity, and benefits.</Text>
           </Box>
 
-          {/* Benefit 3 */}
           <Box textAlign="center">
-            <Flex 
-              justifyContent="center" 
-              alignItems="center" 
-              mb={5}
-            >
+            <Flex justifyContent="center" mb={5}>
               <Icon as={Star} boxSize={12} color="#F8ED62" />
             </Flex>
-            <Heading 
-              as="h3" 
-              fontSize="xl"
-              color="gray.800" 
-              mb={3}
-              fontWeight="500"
-            >
-              Growth Opportunities
-            </Heading>
-            <Text 
-              color="gray.600"
-              fontSize="md"
-              lineHeight="tall"
-            >
-              Learn from industry experts and advance your career
-            </Text>
+            <Heading as="h3" fontSize="xl" mb={3}>Growth</Heading>
+            <Text color="gray.600">Learn from experts and advance your career.</Text>
           </Box>
         </SimpleGrid>
       </Box>
 
-      {/* Benefits Button */}
       <Flex justifyContent="center" mt={16} mb={10}>
         <Button
           as={Link}
@@ -342,13 +287,9 @@ const CareerList = () => {
           color="white"
           px={8}
           py={5}
-          fontSize="md"
-          fontWeight="500"
           borderRadius="full"
-          _hover={{ bgGradient: "linear-gradient(to right, #0098cc, #5BC0DC)" }}
-          boxShadow="md"
+          _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
           height="auto"
-          className="benefits-button"
         >
           View Full Benefits Package
         </Button>
@@ -360,8 +301,7 @@ const CareerList = () => {
 const Career = () => {
   const location = useLocation();
   const normalizedPath = location.pathname.replace(/\/$/, '');
-  
-  // Only show the career list on the main career page
+
   if (normalizedPath === '/career') {
     return <CareerList />;
   }

@@ -341,6 +341,7 @@ const fetchStatesFromFallback = async (
         body: JSON.stringify({ country: countryName }),
       }
     );
+    if (!res) return [];
     const json = await res.json();
 
     if (!json.error && json.data?.states) {
@@ -372,6 +373,7 @@ const fetchCitiesFromFallback = async (
         body: JSON.stringify({ country: countryName, state: stateName }),
       }
     );
+    if (!res) return [];
     const json = await res.json();
 
     if (!json.error && json.data) {
