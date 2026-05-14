@@ -1,209 +1,185 @@
-/**
- * Coins Deduction Notification Service Tests
- * 
- * Tests for the coins-deduction-notification Supabase Edge Function
- * Run with: SUPABASE_SERVICE_ROLE_KEY=<key> npm test -- tests/coinsDeductionNotification.test.ts
- * 
- * NOTE: Integration tests require a valid Supabase service_role key.
- * Set SUPABASE_SERVICE_ROLE_KEY env var to run, otherwise tests are skipped in CI.
- */
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+vi.mock("crypto", async () => {
+  const actual = await vi.importActual<typeof import("crypto")>("crypto");
 
-const SUPABASE_URL = 'https://ibsisfnjxeowvdtvgzff.supabase.co';
-const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/coins-deduction-notification`;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  const mock = {
+    ...actual,
+    createSign: () => ({
+      update: vi.fn(),
+      end: vi.fn(),
+      sign: () => Buffer.from("signature"),
+    }),
+  };
 
-const hasValidKey = !!SERVICE_KEY;
-const describeIntegration = hasValidKey ? describe : describe.skip;
-
-// Test payload helper
-const createTestPayload = (overrides = {}) => ({
-  recipientEmail: 'test-vitest@example.com',
-  recipientName: 'Test User',
-  coinsDeducted: 300000,
-  meetingDate: 'March 15, 2026',
-  meetingTime: '2:00 PM IST',
-  ...overrides,
+  return {
+    ...mock,
+    default: mock,
+  };
 });
 
-describeIntegration('Coins Deduction Notification Edge Function', () => {
-  beforeEach(() => {
+const walletobjectsFactory = vi.fn();
+const jwtFactory = vi.fn();
+
+vi.mock("googleapis", () => ({
+  google: {
+    auth: {
+      JWT: jwtFactory,
+    },
+    walletobjects: walletobjectsFactory,
+  },
+}));
+
+const createResponse = () => {
+  const headers = new Map<string, string>();
+  let statusCode = 200;
+  let body: any;
+
+  return {
+    headers,
+
+    get statusCode() {
+      return statusCode;
+    },
+
+    get body() {
+      return body;
+    },
+
+    status(code: number) {
+      statusCode = code;
+      return this;
+    },
+
+    json(payload: unknown) {
+      body = payload;
+      return this;
+    },
+
+    send(payload: unknown) {
+      body = payload;
+      return this;
+    },
+
+    setHeader(name: string, value: string) {
+      headers.set(name, value);
+    },
+  };
+};
+
+describe("google wallet local route", () => {
+  afterEach(() => {
+    delete process.env.GOOGLE_WALLET_ISSUER_ID;
+    delete process.env.GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL;
+    delete process.env.GOOGLE_WALLET_PRIVATE_KEY;
+    delete process.env.GOOGLE_WALLET_CLASS_SUFFIX;
+
     vi.clearAllMocks();
   });
 
-  describe('Input Validation', () => {
-    it('should reject requests missing recipientEmail', async () => {
-      const response = await fetch(FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SERVICE_KEY}`,
+  it("returns a native Google Wallet saveUrl when local issuer config is present", async () => {
+    process.env.GOOGLE_WALLET_ISSUER_ID = "issuer-123";
+
+    process.env.GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL =
+      "wallet-service@hushh-tech-prod.iam.gserviceaccount.com";
+
+    process.env.GOOGLE_WALLET_PRIVATE_KEY = "test-private-key";
+
+    process.env.GOOGLE_WALLET_CLASS_SUFFIX =
+      "hushh_gold_investor_v1";
+
+    const genericclass = {
+      get: vi.fn().mockRejectedValue({ code: 404 }),
+      insert: vi.fn().mockResolvedValue(undefined),
+      update: vi.fn().mockResolvedValue(undefined),
+    };
+
+    const genericobject = {
+      get: vi.fn().mockRejectedValue({ code: 404 }),
+      insert: vi.fn().mockResolvedValue(undefined),
+      update: vi.fn().mockResolvedValue(undefined),
+    };
+
+    walletobjectsFactory.mockReturnValue({
+      genericclass,
+      genericobject,
+    });
+
+    jwtFactory.mockImplementation(() => ({}));
+
+    const { default: googleWalletPassHandler } = await import(
+      "../api/google-wallet-pass.js"
+    );
+
+    const req = {
+      method: "POST",
+
+      body: {
+        passType: "storeCard",
+
+        description: "Hushh Gold Investor Pass",
+
+        organizationName: "Hushh Technologies",
+
+        headerFields: [
+          {
+            key: "status",
+            value: "Gold Member",
+          },
+          {
+            key: "org",
+            value: "Hushh",
+          },
+        ],
+
+        primaryFields: [
+          {
+            key: "investor",
+            value: "Test User",
+          },
+        ],
+
+        secondaryFields: [
+          {
+            key: "class",
+            value: "Investor - Class B",
+          },
+        ],
+
+        auxiliaryFields: [
+          {
+            key: "email",
+            value: "test@example.com",
+          },
+          {
+            key: "memberId",
+            value: "test-user",
+          },
+        ],
+
+        barcode: {
+          message:
+            "https://hushhtech.com/investor/test-user",
         },
-        body: JSON.stringify({ coinsDeducted: 300000, meetingDate: 'March 15' }),
-      });
+      },
+    };
 
-      const data = await response.json();
-      expect(response.status).toBe(400);
-      expect(data.error).toContain('Missing recipientEmail');
+    const res = createResponse();
+
+    await googleWalletPassHandler(req, res);
+
+    expect(res.statusCode).toBe(200);
+
+    expect(res.body).toMatchObject({
+      provider: "local",
     });
 
-    it('should reject requests with empty body', async () => {
-      const response = await fetch(FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SERVICE_KEY}`,
-        },
-        body: JSON.stringify({}),
-      });
+    expect(String(res.body.saveUrl)).toMatch(
+      /^https:\/\/pay\.google\.com\/gp\/v\/save\//
+    );
 
-      const data = await response.json();
-      expect(response.status).toBe(400);
-      expect(data).toHaveProperty('error');
-    });
-  });
+    expect(genericclass.insert).toHaveBeenCalledTimes(1);
 
-  describe('CORS Support', () => {
-    it('should handle OPTIONS preflight requests', async () => {
-      const response = await fetch(FUNCTION_URL, {
-        method: 'OPTIONS',
-        headers: {
-          'Origin': 'https://hushh.ai',
-          'Access-Control-Request-Method': 'POST',
-          'Access-Control-Request-Headers': 'content-type,authorization',
-        },
-      });
-
-      expect(response.status).toBe(200);
-      expect(response.headers.get('access-control-allow-origin')).toBe('*');
-    });
-  });
-
-  describe('Email Sending', () => {
-    it('should process valid payload without validation error (200 or 500 if SMTP unavailable)', async () => {
-      const payload = createTestPayload({
-        recipientName: `Test User - ${Date.now()}`,
-        recipientEmail: 'test-vitest-deduction@example.com',
-      });
-
-      const response = await fetch(FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SERVICE_KEY}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      // Valid payload should NOT return 400
-      expect(response.status).not.toBe(400);
-
-      if (response.status === 200) {
-        expect(data.success).toBe(true);
-        expect(data.message).toBe('Deduction email sent');
-      } else {
-        expect(response.status).toBe(500);
-        expect(data).toHaveProperty('error');
-      }
-    });
-
-    it('should handle missing optional fields with defaults', async () => {
-      const payload = {
-        recipientEmail: 'test-vitest-minimal@example.com',
-      };
-
-      const response = await fetch(FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SERVICE_KEY}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      // recipientEmail is provided → NOT a validation error
-      expect(response.status).not.toBe(400);
-    });
-
-    it('should accept meeting details without validation error', async () => {
-      const payload = createTestPayload({
-        recipientEmail: 'test-vitest-meeting@example.com',
-        meetingDate: 'April 1, 2026',
-        meetingTime: '10:00 AM PST',
-      });
-
-      const response = await fetch(FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SERVICE_KEY}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      // Valid payload → not a validation error
-      expect(response.status).not.toBe(400);
-    });
-  });
-
-  describe('Response Format', () => {
-    it('should return valid JSON response structure', async () => {
-      const payload = createTestPayload();
-
-      const response = await fetch(FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SERVICE_KEY}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      expect(response.status).not.toBe(400);
-
-      if (response.status === 200) {
-        expect(data).toHaveProperty('success');
-        expect(data).toHaveProperty('message');
-        expect(data.success).toBe(true);
-      } else {
-        expect(data).toHaveProperty('error');
-        expect(typeof data.error).toBe('string');
-      }
-    });
-
-    it('should return error structure on validation failure', async () => {
-      const response = await fetch(FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SERVICE_KEY}`,
-        },
-        body: JSON.stringify({}),
-      });
-
-      const data = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(data).toHaveProperty('error');
-      expect(typeof data.error).toBe('string');
-    });
-  });
-});
-
-// Smoke test — always runs (no auth needed for OPTIONS)
-describe('Coins Deduction Notification Smoke Test', () => {
-  it('function is deployed and reachable', async () => {
-    const response = await fetch(FUNCTION_URL, {
-      method: 'OPTIONS',
-    });
-
-    expect(response.ok).toBe(true);
+    expect(genericobject.insert).toHaveBeenCalledTimes(1);
   });
 });

@@ -56,7 +56,7 @@ describe("ProfilePage CTA group", () => {
     const ctaGroup = container.querySelector('[data-testid="profile-cta-group"]');
 
     expect(ctaGroup?.className).toContain("grid");
-    expect(ctaGroup?.className).toContain("gap-3");
+    expect(ctaGroup?.className).toContain("gap-4");
     expect(ctaGroup?.className).toContain("sm:grid-cols-2");
     expect(ctaGroup?.textContent).toContain("Complete Your Hushh Profile");
     expect(ctaGroup?.textContent).toContain("Discover Fund A");

@@ -480,7 +480,7 @@ describe("Auth Flow — Supabase Project Configuration (Regression Guard)", () =
   });
 
   it("getUserDetails.ts must NOT contain old Supabase project reference", async () => {
-    const fs = await import("fs");
+    const fs = await import("node:fs");
     const source = fs.readFileSync(
       "src/services/authentication/getUserDetails.ts",
       "utf-8"
@@ -491,7 +491,7 @@ describe("Auth Flow — Supabase Project Configuration (Regression Guard)", () =
   });
 
   it("checkRegistrationStatus.ts must NOT contain old Supabase URL", async () => {
-    const fs = await import("fs");
+    const fs = await import("node:fs");
     const source = fs.readFileSync(
       "src/services/authentication/checkRegistrationStatus.ts",
       "utf-8"

@@ -1,12 +1,18 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("crypto", () => ({
-  createSign: () => ({
-    update: vi.fn(),
-    end: vi.fn(),
-    sign: () => Buffer.from("signature"),
-  }),
-}));
+vi.mock("crypto", () => {
+  const mock = {
+    createSign: () => ({
+      update: vi.fn(),
+      end: vi.fn(),
+      sign: () => Buffer.from("signature"),
+    }),
+  };
+  return {
+    ...mock,
+    default: mock,
+  };
+});
 
 const walletobjectsFactory = vi.fn();
 const jwtFactory = vi.fn();
@@ -23,7 +29,7 @@ vi.mock("googleapis", () => ({
 const createResponse = () => {
   const headers = new Map<string, string>();
   let statusCode = 200;
-  let body: unknown;
+  let body: any;
 
   return {
     headers,

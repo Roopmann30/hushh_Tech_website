@@ -6,7 +6,7 @@ import googleWalletPassHandler from "../api/google-wallet-pass.js";
 const createResponse = () => {
   const headers = new Map<string, string>();
   let statusCode = 200;
-  let body: unknown;
+  let body: any;
 
   return {
     headers,

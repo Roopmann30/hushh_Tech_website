@@ -1,18 +1,26 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
+
 
 export default defineConfig({
+  plugins: [],
+
   test: {
     globals: true,
-    environment: 'node',
-    include: ['tests/**/*.test.ts'],
+    environment: "jsdom",
+
+    setupFiles: ["./tests/setup.ts"],
+
+    include: ["tests/**/*.test.ts"],
+
     exclude: [
-      'node_modules/**',
-      // Live Supabase integration suite (disabled until backend/schema is stable again)
-      'tests/ndaIntegration.test.ts',
+      "node_modules/**",
+      "tests/ndaIntegration.test.ts",
     ],
+
     coverage: {
-      reporter: ['text', 'json', 'html'],
+      reporter: ["text", "json", "html"],
     },
+
     testTimeout: 15000,
   },
 });
