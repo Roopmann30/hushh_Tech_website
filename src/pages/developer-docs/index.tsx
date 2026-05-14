@@ -23,7 +23,7 @@ import {
   IconButton,
   useDisclosure,
 } from '@chakra-ui/react';
-import { FiHome, FiSmartphone, FiCode, FiMenu, FiPackage, FiBook, FiHelpCircle } from 'react-icons/fi';
+import { FiHome, FiSmartphone, FiCode, FiMenu, FiPackage, FiBook, FiHelpCircle, FiCheck } from 'react-icons/fi';
 import { SiApple, SiAndroid, SiReact } from 'react-icons/si';
 
 // Primary accent color
@@ -127,47 +127,82 @@ const Step = ({ number, title, description, code }: {
   title: string;
   description: string;
   code?: string;
-}) => (
-  <HStack align="start" spacing={4}>
-    <Flex
-      flexShrink={0}
-      w={8}
-      h={8}
-      borderRadius="full"
-      bg={`${PRIMARY_COLOR}20`}
-      color={PRIMARY_COLOR}
-      fontWeight="bold"
-      fontSize="sm"
-      align="center"
-      justify="center"
-    >
-      {number}
-    </Flex>
-    <VStack align="start" spacing={1} flex={1}>
-      <Text fontWeight="bold" color="gray.900">{title}</Text>
-      <Text fontSize="sm" color="gray.500">{description}</Text>
-      {code && (
-        <Code
-          display="block"
-          w="full"
-          p={3}
-          mt={2}
-          borderRadius="lg"
-          bg="gray.900"
-          color="green.400"
-          fontSize="xs"
-          whiteSpace="pre-wrap"
-          overflowX="auto"
-        >
-          {code}
-        </Code>
-      )}
-    </VStack>
-  </HStack>
-);
+}) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (code) {
+      navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <HStack align="start" spacing={4}>
+      <Flex
+        flexShrink={0}
+        w={8}
+        h={8}
+        borderRadius="full"
+        bg={`${PRIMARY_COLOR}20`}
+        color={PRIMARY_COLOR}
+        fontWeight="bold"
+        fontSize="sm"
+        align="center"
+        justify="center"
+      >
+        {number}
+      </Flex>
+      <VStack align="start" spacing={1} flex={1} w="full" overflow="hidden">
+        <Text fontWeight="bold" color="gray.900">{title}</Text>
+        <Text fontSize="sm" color="gray.500">{description}</Text>
+        {code && (
+          <Box position="relative" w="full" mt={2}>
+            <Code
+              display="block"
+              w="full"
+              p={4}
+              pt={10}
+              borderRadius="lg"
+              bg="gray.900"
+              color="green.400"
+              fontSize="xs"
+              whiteSpace="pre-wrap"
+              overflowX="auto"
+            >
+              {code}
+            </Code>
+            <Box
+              as="button"
+              onClick={handleCopy}
+              position="absolute"
+              top={2}
+              right={2}
+              px={3}
+              py={1.5}
+              bg="whiteAlpha.200"
+              color="gray.300"
+              fontSize="xs"
+              fontWeight="medium"
+              borderRadius="md"
+              transition="all 0.2s"
+              _hover={{ bg: 'whiteAlpha.300', color: 'white' }}
+              _active={{ bg: 'green.500', color: 'white' }}
+            >
+              {copied ? 'Copied!' : 'Copy'}
+            </Box>
+          </Box>
+        )}
+      </VStack>
+    </HStack>
+  );
+};
 
 // Main Content Component
 const MainContent = ({ activeSection }: { activeSection: string }) => {
+  const [feedback, setFeedback] = useState<string | null>(null);
+
   return (
     <Box maxW="900px" mx="auto" px={{ base: 4, md: 8 }} py={{ base: 6, md: 10 }}>
       {/* Breadcrumbs */}
@@ -293,53 +328,73 @@ git push
       </Accordion>
 
       {/* Feedback Section */}
-      <Box 
-        mt={12} 
-        p={6} 
-        bg="gray.50" 
-        borderRadius="xl"
-        border="1px solid"
-        borderColor="gray.200"
-      >
-        <HStack justify="space-between" flexWrap="wrap" gap={4}>
-          <VStack align="start" spacing={1}>
-            <Text fontWeight="bold" color="gray.900">Was this guide helpful? 🤔</Text>
-            <Text fontSize="sm" color="gray.500">We value your feedback!</Text>
-          </VStack>
-          <HStack spacing={3}>
-            <Box
-              as="button"
-              px={4}
-              py={2}
-              bg="white"
-              border="1px solid"
-              borderColor="gray.200"
-              borderRadius="lg"
-              fontSize="sm"
-              fontWeight="medium"
-              transition="all 0.2s"
-              _hover={{ borderColor: 'green.400' }}
-            >
-              👍 Yes
-            </Box>
-            <Box
-              as="button"
-              px={4}
-              py={2}
-              bg="white"
-              border="1px solid"
-              borderColor="gray.200"
-              borderRadius="lg"
-              fontSize="sm"
-              fontWeight="medium"
-              transition="all 0.2s"
-              _hover={{ borderColor: 'red.400' }}
-            >
-              👎 No
-            </Box>
+      {feedback ? (
+        <Box 
+          mt={12} 
+          p={6} 
+          bg="green.50" 
+          borderRadius="xl"
+          border="1px solid"
+          borderColor="green.200"
+        >
+          <HStack spacing={3} justify="center">
+            <Icon as={FiCheck} color="green.500" boxSize={6} />
+            <Text fontWeight="medium" color="green.800" fontSize="lg">
+              Thanks for your feedback!
+            </Text>
           </HStack>
-        </HStack>
-      </Box>
+        </Box>
+      ) : (
+        <Box 
+          mt={12} 
+          p={6} 
+          bg="gray.50" 
+          borderRadius="xl"
+          border="1px solid"
+          borderColor="gray.200"
+        >
+          <HStack justify="space-between" flexWrap="wrap" gap={4}>
+            <VStack align="start" spacing={1}>
+              <Text fontWeight="bold" color="gray.900">Was this guide helpful? 🤔</Text>
+              <Text fontSize="sm" color="gray.500">We value your feedback!</Text>
+            </VStack>
+            <HStack spacing={3}>
+              <Box
+                as="button"
+                onClick={() => setFeedback('yes')}
+                px={4}
+                py={2}
+                bg="white"
+                border="1px solid"
+                borderColor="gray.200"
+                borderRadius="lg"
+                fontSize="sm"
+                fontWeight="medium"
+                transition="all 0.2s"
+                _hover={{ borderColor: 'green.400', bg: 'green.50' }}
+              >
+                👍 Yes
+              </Box>
+              <Box
+                as="button"
+                onClick={() => setFeedback('no')}
+                px={4}
+                py={2}
+                bg="white"
+                border="1px solid"
+                borderColor="gray.200"
+                borderRadius="lg"
+                fontSize="sm"
+                fontWeight="medium"
+                transition="all 0.2s"
+                _hover={{ borderColor: 'red.400', bg: 'red.50' }}
+              >
+                👎 No
+              </Box>
+            </HStack>
+          </HStack>
+        </Box>
+      )}
     </Box>
   );
 };
