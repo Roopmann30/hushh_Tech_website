@@ -68,10 +68,23 @@ export function clearLegacyAuthStorage() {
     return;
   }
 
-  LEGACY_AUTH_STORAGE_KEYS.forEach((key) => {
-    window.localStorage.removeItem(key);
-    window.sessionStorage.removeItem(key);
-  });
+  const keys = LEGACY_AUTH_STORAGE_KEYS;
+  
+  try {
+    if (typeof window.localStorage !== "undefined" && typeof window.localStorage.removeItem === "function") {
+      keys.forEach((key) => window.localStorage.removeItem(key));
+    }
+  } catch (e) {
+    console.warn("[AuthSession] Failed to clear legacy localStorage:", e);
+  }
+
+  try {
+    if (typeof window.sessionStorage !== "undefined" && typeof window.sessionStorage.removeItem === "function") {
+      keys.forEach((key) => window.sessionStorage.removeItem(key));
+    }
+  } catch (e) {
+    console.warn("[AuthSession] Failed to clear legacy sessionStorage:", e);
+  }
 }
 
 export function buildOAuthRedirectTo(
@@ -404,7 +417,9 @@ export function broadcastAuthEvent(reason: AuthSessionReason) {
   };
 
   try {
-    window.localStorage.setItem(AUTH_EVENT_STORAGE_KEY, JSON.stringify(payload));
+    if (typeof window.localStorage !== "undefined" && typeof window.localStorage.setItem === "function") {
+      window.localStorage.setItem(AUTH_EVENT_STORAGE_KEY, JSON.stringify(payload));
+    }
   } catch (error) {
     console.warn("[AuthSession] Failed to broadcast auth event:", error);
   }

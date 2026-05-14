@@ -210,11 +210,11 @@ describe("AuthSessionProvider", () => {
         })
       );
     });
-    await flush();
-
-    expect(container.querySelector('[data-testid="status"]')?.textContent).toBe(
-      "invalidated"
-    );
+    await vi.waitFor(() => {
+      expect(container.querySelector('[data-testid="status"]')?.textContent).toBe(
+        "invalidated"
+      );
+    });
     expect(container.querySelector('[data-testid="reason"]')?.textContent).toBe(
       "deleted"
     );
@@ -264,8 +264,9 @@ describe("HushhTechNavDrawer auth gating", () => {
 
   const flush = async () => {
     await act(async () => {
-      await Promise.resolve();
-      await Promise.resolve();
+      for (let i = 0; i < 20; i++) {
+        await Promise.resolve();
+      }
     });
   };
 
@@ -408,11 +409,11 @@ describe("HushhTechNavDrawer auth gating", () => {
     );
 
     await act(async () => {
-      logoutButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      logoutButton?.click();
     });
-    await flush();
-
-    expect(mockSignOut).toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(mockSignOut).toHaveBeenCalled();
+    });
   });
 });
 
