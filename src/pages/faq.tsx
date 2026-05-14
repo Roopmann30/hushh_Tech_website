@@ -37,8 +37,8 @@ const faqs: FaqItem[] = [
   },
   {
     question: "What’s the biggest challenge Hu$$h faces, and how do you plan to address it?",
-    answer: "Our biggest challenge is managing growth without losing our soul. We’re gaining traction fast, and with that comes the risk of diluting our values as we scale. To address this, we’re committed to a few non-negotiables: transparency, ethical data use, and a human-centered approach. We’re building a strong core team that not only understands finance but is also deeply aligned with our vision. As we grow, we’ll be deliberate about who joins the Hu$$h family, ensuring that every addition strengthens our values rather than compromises them. Growth is only meaningful if it’s rooted in integrity."  
-  },  
+    answer: "Our biggest challenge is managing growth without losing our soul. We’re gaining traction fast, and with that comes the risk of diluting our values as we scale. To address this, we’re committed to a few non-negotiables: transparency, ethical data use, and a human-centered approach. We’re building a strong core team that not only understands finance but is also deeply aligned with our vision. As we grow, we’ll be deliberate about who joins the Hu$$h family, ensuring that every addition strengthens our values rather than compromises them. Growth is only meaningful if it’s rooted in integrity."
+  },
   {
     question: "Why should investors trust that Hu$$h’s results are sustainable over time?",
     answer: "Trust comes from discipline, and our discipline is unbreakable. We’re not just achieving returns by chasing the latest market trends; we’re doing it through structured, data-driven strategies that have proven resilient over time. Our options income strategy, our focus on high-free-cash-flow stocks, and our conservative approach to volatility capture are built to endure. We’re not promising the moon—we’re focused on realistic, consistent growth. Just as Apple created products that people could rely on, we’re creating a financial ecosystem that people can count on, year in and year out."
@@ -56,16 +56,16 @@ const faqs: FaqItem[] = [
     answer: "Being “human-first” isn’t a slogan for us—it’s a fundamental operational principle. Every decision we make has to answer the question: “Does this serve our users and investors?” For example, our privacy policies are designed to give users control over their data, not just because it’s compliant, but because it’s the right thing to do. Our platform features are designed to educate, empower, and support, not overwhelm or manipulate. In practical terms, “human-first” means transparency, simplicity, and a commitment to integrity in every interaction we have with our users and stakeholders"
   },
   {
-    question:"How will Hu$$h continue to attract and retain top talent as it scales?",
-    answer:"Talent is the backbone of any great company, and we’re committed to building a team of “learn-it-alls,” not “know-it-alls.” We look for people who are hungry, curious, and aligned with our mission. Our culture is built on transparency, accountability, and a love for innovation. We don’t just offer jobs; we offer a chance to be part of a movement that’s reshaping wealth creation. Like Apple’s approach to product design, we believe in investing in people who believe in our vision, creating an environment that fosters both excellence and creativity."
+    question: "How will Hu$$h continue to attract and retain top talent as it scales?",
+    answer: "Talent is the backbone of any great company, and we’re committed to building a team of “learn-it-alls,” not “know-it-alls.” We look for people who are hungry, curious, and aligned with our mission. Our culture is built on transparency, accountability, and a love for innovation. We don’t just offer jobs; we offer a chance to be part of a movement that’s reshaping wealth creation. Like Apple’s approach to product design, we believe in investing in people who believe in our vision, creating an environment that fosters both excellence and creativity."
   },
   {
-    question:"If Hu$$h could only achieve one thing, what would it be?",
-    answer:"To redefine wealth as something personal, empowering, and accessible. At the end of the day, we’re here to make sure that every person can see their data as an asset they own and control. If we can shift the world’s perspective—even a little—toward that vision, we’ll have succeeded beyond measure. We’re not just creating financial returns; we’re creating a legacy where data-driven wealth is human-centered and inclusive."
+    question: "If Hu$$h could only achieve one thing, what would it be?",
+    answer: "To redefine wealth as something personal, empowering, and accessible. At the end of the day, we’re here to make sure that every person can see their data as an asset they own and control. If we can shift the world’s perspective—even a little—toward that vision, we’ll have succeeded beyond measure. We’re not just creating financial returns; we’re creating a legacy where data-driven wealth is human-centered and inclusive."
   },
   {
-    question:"What’s the biggest risk you’re willing to take, and why?",
-    answer:"The biggest risk we’re willing to take is betting on the intelligence and autonomy of our users. We believe people are smarter and more capable than they’re often given credit for. By empowering them with the right tools, insights, and control over their data, we’re stepping away from the traditional “trust us, we know best” model. It’s a leap of faith, but it’s one we believe will pay off. Our users are our greatest asset, and betting on them to succeed is a risk we’re proud to take."
+    question: "What’s the biggest risk you’re willing to take, and why?",
+    answer: "The biggest risk we’re willing to take is betting on the intelligence and autonomy of our users. We believe people are smarter and more capable than they’re often given credit for. By empowering them with the right tools, insights, and control over their data, we’re stepping away from the traditional “trust us, we know best” model. It’s a leap of faith, but it’s one we believe will pay off. Our users are our greatest asset, and betting on them to succeed is a risk we’re proud to take."
   }
 ];
 
@@ -140,115 +140,116 @@ const FaqPage: React.FC = () => {
             const triggerId = `faq-trigger-${index}`;
 
             return (
-            <Box
-              key={index}
-              bg="white"
-              borderRadius="2xl"
-              overflow="hidden"
-              borderWidth="1px"
-              borderColor="gray.100"
-              boxShadow={
-                isOpen
-                  ? "0 4px 24px rgba(0, 0, 0, 0.08)"
-                  : "0 2px 12px rgba(0, 0, 0, 0.06)"
-              }
-              transition="box-shadow 0.2s ease, border-color 0.2s ease"
-              _hover={{
-                borderColor: "gray.200",
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.07)",
-              }}
-            >
-              <Heading
-                as="h3"
-                m={0}
-                fontFamily={bodyFont}
-                fontSize={{ base: "0.95rem", md: "1rem" }}
-                fontWeight="600"
-                lineHeight="snug"
+              <Box
+                key={index}
+                bg="white"
+                borderRadius="2xl"
+                overflow="hidden"
+                borderWidth="1px"
+                borderColor="gray.100"
+                boxShadow={
+                  isOpen
+                    ? "0 4px 24px rgba(0, 0, 0, 0.08)"
+                    : "0 2px 12px rgba(0, 0, 0, 0.06)"
+                }
+                transition="box-shadow 0.2s ease, border-color 0.2s ease"
+                _hover={{
+                  borderColor: "gray.200",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.07)",
+                }}
               >
-                <Box role="group" w="100%">
-                  <Box
-                    as="button"
-                    type="button"
-                    id={triggerId}
-                    aria-expanded={isOpen}
-                    aria-controls={panelId}
-                    onClick={() => toggleAccordion(index)}
-                    display="flex"
-                    w="100%"
-                    alignItems="flex-start"
-                    justifyContent="space-between"
-                    gap={4}
-                    px={{ base: 5, md: 6 }}
-                    py={{ base: 5, md: 6 }}
-                    cursor="pointer"
-                    border="none"
-                    bg="transparent"
-                    borderTopRadius="2xl"
-                    textAlign="left"
-                    font="inherit"
-                    color="gray.900"
-                    transition="background-color 0.2s ease, box-shadow 0.2s ease"
-                    _hover={{
-                      bg: "gray.50",
-                      boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.04)",
-                    }}
-                    _active={{
-                      bg: "gray.100",
-                    }}
-                    _focus={{ outline: "none" }}
-                    _focusVisible={{
-                      boxShadow:
-                        "inset 0 0 0 1px rgba(0, 0, 0, 0.04), 0 0 0 3px rgba(0, 169, 224, 0.45)",
-                    }}
-                  >
-                    <Box
-                      as="span"
-                      display="block"
-                      flex="1"
-                      pr={1}
-                      transition="color 0.2s ease"
-                      _groupHover={{ color: "black" }}
-                    >
-                      {faq.question}
-                    </Box>
-                    <Icon
-                      as={isOpen ? ChevronUpIcon : ChevronDownIcon}
-                      aria-hidden
-                      w={5}
-                      h={5}
-                      mt={0.5}
-                      flexShrink={0}
-                      color="gray.400"
-                      transition="color 0.2s ease, transform 0.2s ease"
-                      _groupHover={{
-                        color: "gray.600",
-                        transform: isOpen ? "translateY(-1px)" : "translateY(2px)",
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Heading>
-
-              {isOpen && (
-                <Box
-                  id={panelId}
-                  role="region"
-                  aria-labelledby={triggerId}
-                  px={{ base: 5, md: 6 }}
-                  pb={{ base: 5, md: 6 }}
-                  pt={4}
-                  borderTopWidth="1px"
-                  borderTopColor="gray.100"
-                  color="gray.600"
-                  fontSize={{ base: "0.9375rem", md: "1rem" }}
-                  fontWeight="400"
-                  lineHeight="tall"
+                <Heading
+                  as="h3"
+                  m={0}
+                  fontFamily={bodyFont}
+                  fontSize={{ base: "0.95rem", md: "1rem" }}
+                  fontWeight="600"
+                  lineHeight="snug"
                 >
-                  {faq.answer}
-                </Box>
-              )}
-            </Box>
+                  <Box role="group" w="100%">
+                    <Box
+                      as="button"
+                      type="button"
+                      id={triggerId}
+                      aria-expanded={isOpen}
+                      aria-controls={panelId}
+                      onClick={() => toggleAccordion(index)}
+                      display="flex"
+                      w="100%"
+                      alignItems="flex-start"
+                      justifyContent="space-between"
+                      gap={4}
+                      px={{ base: 5, md: 6 }}
+                      py={{ base: 5, md: 6 }}
+                      cursor="pointer"
+                      border="none"
+                      bg="transparent"
+                      borderTopRadius="2xl"
+                      textAlign="left"
+                      fontSize="inherit"
+                      fontFamily="inherit"
+                      color="gray.900"
+                      transition="background-color 0.2s ease, box-shadow 0.2s ease"
+                      _hover={{
+                        bg: "gray.50",
+                        boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.04)",
+                      }}
+                      _active={{
+                        bg: "gray.100",
+                      }}
+                      _focus={{ outline: "none" }}
+                      _focusVisible={{
+                        boxShadow:
+                          "inset 0 0 0 1px rgba(0, 0, 0, 0.04), 0 0 0 3px rgba(0, 169, 224, 0.45)",
+                      }}
+                    >
+                      <Box
+                        as="span"
+                        display="block"
+                        flex="1"
+                        pr={1}
+                        transition="color 0.2s ease"
+                        _groupHover={{ color: "black" }}
+                      >
+                        {faq.question}
+                      </Box>
+                      <Icon
+                        as={isOpen ? ChevronUpIcon : ChevronDownIcon}
+                        aria-hidden
+                        w={5}
+                        h={5}
+                        mt={0.5}
+                        flexShrink={0}
+                        color="gray.400"
+                        transition="color 0.2s ease, transform 0.2s ease"
+                        _groupHover={{
+                          color: "gray.600",
+                          transform: isOpen ? "translateY(-1px)" : "translateY(2px)",
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Heading>
+
+                {isOpen && (
+                  <Box
+                    id={panelId}
+                    role="region"
+                    aria-labelledby={triggerId}
+                    px={{ base: 5, md: 6 }}
+                    pb={{ base: 5, md: 6 }}
+                    pt={4}
+                    borderTopWidth="1px"
+                    borderTopColor="gray.100"
+                    color="gray.600"
+                    fontSize={{ base: "0.9375rem", md: "1rem" }}
+                    fontWeight="400"
+                    lineHeight="tall"
+                  >
+                    {faq.answer}
+                  </Box>
+                )}
+              </Box>
             );
           })}
         </VStack>
