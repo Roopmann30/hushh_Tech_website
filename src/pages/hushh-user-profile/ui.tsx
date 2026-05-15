@@ -191,7 +191,7 @@ const HushhUserProfilePage: React.FC = () => {
                       role="button"
                       tabIndex={0}
                       aria-label={`Edit ${label}`}
-                      onKeyDown={(e) => { if (e.key === 'Enter' && options) setEditingField(isEditing ? null : fieldName); }}
+                      onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && options) setEditingField(isEditing ? null : fieldName); }}
                     >
                       <span className="text-sm text-gray-500 font-light shrink-0">{label}</span>
                       <div className="flex items-center gap-2">
@@ -313,7 +313,7 @@ const HushhUserProfilePage: React.FC = () => {
               }
             />
             <FieldRow label="Age">
-              <input type="number" value={form.age} onChange={(e) => handleChange("age", e.target.value)} className={inlineInput} placeholder="34" />
+              <input type="number" value={form.age} onChange={(e) => handleChange("age", e.target.value)} className={inlineInput} placeholder="34" min="18" max="120" inputMode="numeric" aria-label="Age" />
             </FieldRow>
           </div>
 
@@ -359,10 +359,12 @@ const HushhUserProfilePage: React.FC = () => {
             <FieldRow label="Initial Investment">
               <input
                 type="text"
+                inputMode="numeric"
                 value={form.initialInvestmentAmount ? `$${Number(form.initialInvestmentAmount).toLocaleString()}` : ""}
                 onChange={(e) => { const raw = e.target.value.replace(/[^0-9]/g, ""); handleChange("initialInvestmentAmount", raw); }}
                 className={inlineInput}
                 placeholder="$50,000"
+                aria-label="Initial investment amount in USD"
               />
             </FieldRow>
           </div>
@@ -411,7 +413,7 @@ const HushhUserProfilePage: React.FC = () => {
         <section className="mb-12 border-t border-gray-200 pt-8">
           <div className="flex items-center justify-between py-3 mb-6">
             <span className="text-sm text-gray-500 font-light">Profile Link</span>
-            <button type="button" onClick={onCopy} className="flex items-center gap-2 text-hushh-blue cursor-pointer">
+            <button type="button" onClick={onCopy} aria-label={hasCopied ? "Profile link copied" : "Copy profile link"} className="flex items-center gap-2 text-hushh-blue cursor-pointer">
               <span className="text-xs font-medium truncate max-w-[160px]">{profileUrl || "hushhtech.com/investor/..."}</span>
               {hasCopied ? <Check className="w-4 h-4 text-ios-green" /> : <Copy className="w-4 h-4" />}
             </button>
@@ -444,7 +446,7 @@ const HushhUserProfilePage: React.FC = () => {
             </p>
           )}
           {!googleWalletSupported && (
-            <p className="mt-3 text-xs text-gray-500 font-light">
+            <p className={`text-xs text-gray-500 font-light ${!appleWalletSupported ? "mt-1" : "mt-3"}`}>
               {googleWalletSupportMessage}
             </p>
           )}
