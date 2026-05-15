@@ -62,7 +62,7 @@ const NDAAdminPage: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleLogin();
     }
@@ -137,14 +137,17 @@ const NDAAdminPage: React.FC = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder="Password"
             style={styles.input}
             autoFocus
+            aria-label="Admin Password"
+            aria-invalid={!!passwordError}
+            aria-describedby={passwordError ? "password-error" : undefined}
           />
           
           {passwordError && (
-            <p style={styles.error}>{passwordError}</p>
+            <p id="password-error" style={styles.error} role="alert">{passwordError}</p>
           )}
           
           <button onClick={handleLogin} style={styles.button}>
@@ -158,7 +161,7 @@ const NDAAdminPage: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div style={styles.container}>
+      <div style={styles.container} role="status" aria-live="polite">
         <p style={styles.loading}>Loading NDA records...</p>
       </div>
     );
@@ -180,7 +183,16 @@ const NDAAdminPage: React.FC = () => {
   return (
     <div style={styles.container}>
       <h1 style={styles.pageTitle}>NDA Agreements Signed</h1>
-      <p style={styles.recordCount}>Total: {ndaRecords.length} records</p>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginBottom: '24px' }}>
+        <p style={{ ...styles.recordCount, marginBottom: 0 }} role="status">Total: {ndaRecords.length} records</p>
+        <button 
+          onClick={fetchNDARecords} 
+          style={{ ...styles.logoutButton, margin: 0, padding: '5px 12px', fontSize: '12px', display: 'inline-block' }}
+          aria-label="Refresh records"
+        >
+          🔄 Refresh
+        </button>
+      </div>
       
       <div style={styles.tableWrapper}>
         <table style={styles.table}>
