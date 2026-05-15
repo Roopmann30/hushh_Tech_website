@@ -29,16 +29,25 @@ interface ChatPaymentModalProps {
 
 export function ChatPaymentModal({ isOpen, onClose, onPayment, isProcessing = false }: ChatPaymentModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" isCentered>
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      size="md" 
+      isCentered
+      closeOnOverlayClick={!isProcessing}
+      closeOnEsc={!isProcessing}
+    >
       <ModalOverlay backdropFilter="blur(4px)" />
       <ModalContent borderRadius="16px" mx={4}>
-        <ModalCloseButton
-          aria-label="Close payment modal"
-          _focusVisible={{
-            boxShadow: "0 0 0 2px var(--chakra-colors-blue-500)",
-            outline: "none",
-          }}
-        />
+        {!isProcessing && (
+          <ModalCloseButton
+            aria-label="Close payment modal"
+            _focusVisible={{
+              boxShadow: "0 0 0 2px var(--chakra-colors-blue-500)",
+              outline: "none",
+            }}
+          />
+        )}
         <ModalHeader pt={6} pb={2}>
           <HStack spacing={2}>
             <Icon as={MessageCircle} boxSize={6} color="blue.500" />
@@ -110,6 +119,7 @@ export function ChatPaymentModal({ isOpen, onClose, onPayment, isProcessing = fa
                 onClick={onClose}
                 color="gray.500"
                 _hover={{ bg: 'gray.100' }}
+                isDisabled={isProcessing}
               >
                 Maybe Later
               </Button>
