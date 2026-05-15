@@ -318,6 +318,7 @@ const KYCDemoPage: React.FC = () => {
                     <Input
                       value={userEmail}
                       onChange={(e) => setUserEmail(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && runKYCCheck()}
                       placeholder="e.g., verified@example.com"
                       bg="gray.50"
                       border="1px solid"
@@ -327,7 +328,10 @@ const KYCDemoPage: React.FC = () => {
                       borderRadius="12px"
                     />
                     <Text fontSize="2xs" color="gray.400" mt={1}>
-                      Try: verified@example.com, review@example.com, failed@example.com
+                      Try:{" "}
+                      <Text as="button" type="button" onClick={() => setUserEmail('verified@example.com')} textDecoration="underline" _hover={{ color: 'black' }}>verified@example.com</Text>,{" "}
+                      <Text as="button" type="button" onClick={() => setUserEmail('review@example.com')} textDecoration="underline" _hover={{ color: 'black' }}>review@example.com</Text>,{" "}
+                      <Text as="button" type="button" onClick={() => setUserEmail('failed@example.com')} textDecoration="underline" _hover={{ color: 'black' }}>failed@example.com</Text>
                     </Text>
                   </FormControl>
 
@@ -338,6 +342,7 @@ const KYCDemoPage: React.FC = () => {
                     <Input
                       value={consentToken}
                       onChange={(e) => setConsentToken(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && runKYCCheck()}
                       placeholder="User consent token"
                       bg="gray.50"
                       border="1px solid"
@@ -406,11 +411,11 @@ const KYCDemoPage: React.FC = () => {
                       alignItems="center"
                       justifyContent="center"
                     >
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(0,0,0,0.2)' }}/>
                       </svg>
                     </Box>
-                    <Text fontSize="lg" fontWeight="600" color="gray.500">
+                    <Text fontSize="lg" fontWeight="600" color="gray.500" role="status" aria-live="polite">
                       No Result Yet
                     </Text>
                     <Text fontSize="sm" color="gray.400" maxW="300px">
