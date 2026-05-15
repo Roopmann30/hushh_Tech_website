@@ -126,7 +126,7 @@ const DeleteAccountModal = ({
     isOpen,
     containerRef: modalRef,
     initialFocusRef: confirmInputRef,
-    onClose: handleClose,
+    onClose: isDeleting ? undefined : handleClose,
   });
 
   if (!isOpen) return null;
@@ -139,7 +139,7 @@ const DeleteAccountModal = ({
       {/* ── Frosted glass overlay ── */}
       <div
         className="fixed inset-0 z-40 bg-white/60 backdrop-blur-sm"
-        onClick={handleClose}
+        onClick={isDeleting ? undefined : handleClose}
       />
 
       {/* ── Modal card — bottom-sheet on mobile, centered on desktop ── */}
