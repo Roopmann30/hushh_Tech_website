@@ -39,15 +39,29 @@ export default function HomePage() {
                   onClick={primaryCTA.action}
                   disabled={primaryCTA.loading}
                   variant={HushhTechCtaVariant.BLACK}
+                  aria-busy={primaryCTA.loading}
                 >
-                  {primaryCTA.text}
-                  <span className="material-symbols-outlined thin-icon text-lg">
-                    arrow_forward
-                  </span>
+                  {primaryCTA.loading ? (
+                    <>
+                      <span
+                        className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"
+                        aria-hidden="true"
+                      />
+                      {primaryCTA.text}
+                    </>
+                  ) : (
+                    <>
+                      {primaryCTA.text}
+                      <span className="material-symbols-outlined thin-icon text-lg">
+                        arrow_forward
+                      </span>
+                    </>
+                  )}
                 </HushhTechCta>
                 <HushhTechCta
                   onClick={() => onNavigate("/discover-fund-a")}
                   variant={HushhTechCtaVariant.WHITE}
+                  aria-label="Discover Fund A — learn about our flagship product"
                 >
                   Discover Fund A
                 </HushhTechCta>
@@ -142,14 +156,17 @@ export default function HomePage() {
           <section className="mt-auto space-y-12 lg:space-y-16">
             <div className="inline-block px-3 py-1 border border-hushh-blue/20 rounded-full bg-hushh-blue/5">
               <span className="text-[10px] tracking-widest uppercase font-medium text-hushh-blue flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-hushh-blue rounded-full" />
+                <span className="relative flex items-center justify-center w-1.5 h-1.5">
+                  <span className="absolute inline-flex w-full h-full bg-hushh-blue rounded-full opacity-75 animate-ping" />
+                  <span className="relative w-1.5 h-1.5 bg-hushh-blue rounded-full" />
+                </span>
                 AI-Powered Investing
               </span>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-              <div className="bg-ios-gray-bg p-5 rounded-2xl border border-gray-200/60 flex flex-col justify-between min-h-[180px] sm:min-h-[220px] hover:border-hushh-blue/30 transition-colors">
-                <span className="material-symbols-outlined thin-icon text-3xl mb-4 text-hushh-blue">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6" role="list">
+              <div className="bg-ios-gray-bg p-5 rounded-2xl border border-gray-200/60 flex flex-col justify-between min-h-[180px] sm:min-h-[220px] hover:border-hushh-blue/30 transition-colors" role="listitem">
+                <span className="material-symbols-outlined thin-icon text-3xl mb-4 text-hushh-blue" aria-hidden="true">
                   neurology
                 </span>
                 <div>
@@ -164,8 +181,8 @@ export default function HomePage() {
                   </p>
                 </div>
               </div>
-              <div className="bg-ios-gray-bg p-5 rounded-2xl border border-gray-200/60 flex flex-col justify-between min-h-[180px] sm:min-h-[220px] hover:border-hushh-blue/30 transition-colors">
-                <span className="material-symbols-outlined thin-icon text-3xl mb-4 text-ios-dark">
+              <div className="bg-ios-gray-bg p-5 rounded-2xl border border-gray-200/60 flex flex-col justify-between min-h-[180px] sm:min-h-[220px] hover:border-hushh-blue/30 transition-colors" role="listitem">
+                <span className="material-symbols-outlined thin-icon text-3xl mb-4 text-ios-dark" aria-hidden="true">
                   supervised_user_circle
                 </span>
                 <div>
@@ -193,7 +210,7 @@ export default function HomePage() {
                 >
                   The Hushh Advantage
                 </h2>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-4">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-4" role="list">
                   {[
                     {
                       icon: "analytics",
@@ -227,12 +244,14 @@ export default function HomePage() {
                     <div
                       key={item.icon}
                       className="flex flex-col items-center text-center gap-3"
+                      role="listitem"
                     >
                       <div
                         className={`w-12 h-12 rounded-full border border-gray-200/60 flex items-center justify-center ${item.bg}`}
                       >
                         <span
                           className={`material-symbols-outlined thin-icon ${item.color}`}
+                          aria-hidden="true"
                         >
                           {item.icon}
                         </span>
@@ -250,7 +269,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4" role="list">
                 {[
                   {
                     icon: "rocket_launch",
@@ -280,9 +299,11 @@ export default function HomePage() {
                   <div
                     key={item.icon}
                     className="bg-ios-gray-bg border border-gray-200/60 p-4 rounded-2xl hover:border-hushh-blue/30 transition-colors"
+                    role="listitem"
                   >
                     <span
                       className={`material-symbols-outlined thin-icon ${item.color} mb-2`}
+                      aria-hidden="true"
                     >
                       {item.icon}
                     </span>
@@ -314,7 +335,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <footer className="pb-8">
+          <div className="pb-8">
             <p
               className="text-[10px] text-gray-400 text-center leading-relaxed italic max-w-xs sm:max-w-lg lg:max-w-3xl mx-auto font-serif"
               style={playfair}
@@ -323,7 +344,7 @@ export default function HomePage() {
               performance does not guarantee future results. Hushh Technologies is
               an SEC registered investment advisor.
             </p>
-          </footer>
+          </div>
         </div>
       </main>
 

@@ -31,7 +31,17 @@ const PrivacyControlsPage: React.FC = () => {
   }
 
   if (!privacySettings) {
-    return null;
+    return (
+      <Box minH="100dvh" bg="white" display="flex" alignItems="center" justifyContent="center">
+        <VStack spacing={3}>
+          <Text fontSize="17px" fontWeight="500" color={tokens.label}>Unable to load privacy settings</Text>
+          <Text fontSize="14px" color={tokens.secondary}>Please go back and try again.</Text>
+          <Button variant="ghost" color={tokens.blue} onClick={handleBackToProfile} leftIcon={<ArrowLeft size={16} />}>
+            Back to Profile
+          </Button>
+        </VStack>
+      </Box>
+    );
   }
 
   return (
@@ -84,7 +94,7 @@ const PrivacyControlsPage: React.FC = () => {
               >
                 <VStack align="start" spacing={0}>
                   <Text fontSize="15px" fontWeight="500" color={tokens.label}>
-                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                    {FIELD_LABELS[field as keyof typeof FIELD_LABELS] ?? (field.charAt(0).toUpperCase() + field.slice(1))}
                   </Text>
                   <Text fontSize="13px" color={isVisible ? tokens.green : tokens.secondary}>
                     {isVisible ? "Visible on public profile" : "Hidden from public profile"}
@@ -95,6 +105,7 @@ const PrivacyControlsPage: React.FC = () => {
                   isChecked={isVisible}
                   onChange={() => handleToggle("basic_info", field)}
                   colorScheme="blue"
+                  aria-label={`Toggle visibility of ${FIELD_LABELS[field as keyof typeof FIELD_LABELS] ?? field}`}
                 />
               </HStack>
             ))}
@@ -137,6 +148,7 @@ const PrivacyControlsPage: React.FC = () => {
                   isChecked={isVisible}
                   onChange={() => handleToggle("investor_profile", field)}
                   colorScheme="blue"
+                  aria-label={`Toggle visibility of ${FIELD_LABELS[field as keyof typeof FIELD_LABELS] ?? field}`}
                 />
               </HStack>
             ))}
@@ -172,7 +184,7 @@ const PrivacyControlsPage: React.FC = () => {
                       {ONBOARDING_FIELD_LABELS[field]}
                     </Text>
                     <Text fontSize="13px" color={privacySettings.onboarding_data[field as keyof typeof privacySettings.onboarding_data] ? tokens.green : tokens.secondary}>
-                      {privacySettings.onboarding_data[field as keyof typeof privacySettings.onboarding_data] ? "Visible" : "Hidden"}
+                      {privacySettings.onboarding_data[field as keyof typeof privacySettings.onboarding_data] ? "Visible on public profile" : "Hidden from public profile"}
                     </Text>
                   </VStack>
                   <Switch
@@ -180,6 +192,7 @@ const PrivacyControlsPage: React.FC = () => {
                     isChecked={privacySettings.onboarding_data[field as keyof typeof privacySettings.onboarding_data]}
                     onChange={() => handleToggle("onboarding_data", field)}
                     colorScheme="blue"
+                    aria-label={`Toggle visibility of ${ONBOARDING_FIELD_LABELS[field] ?? field}`}
                   />
                 </HStack>
               ))}
@@ -295,7 +308,7 @@ const PrivacyControlsPage: React.FC = () => {
         </Box>
 
         {/* Save Button */}
-        <Box position="sticky" bottom={4} bg="white" py={4} borderTop={`1px solid ${tokens.separator}`}>
+        <Box position="sticky" bottom={4} bg="white" py={4} borderTop={`1px solid ${tokens.separator}`} boxShadow="0 -4px 12px rgba(0,0,0,0.06)">
           <Button
             leftIcon={<Save size={16} />}
             colorScheme="blue"
