@@ -455,8 +455,8 @@ export default function MetricsPage() {
   }, []);
 
   const lookerStudioLink = useMemo(
-    () => buildLookerStudioLink(summary.data?.traffic.lookerStudioReportUrl),
-    [summary.data?.traffic.lookerStudioReportUrl]
+    () => buildLookerStudioLink(summary.data?.traffic?.lookerStudioReportUrl),
+    [summary.data?.traffic?.lookerStudioReportUrl]
   );
   const isLoaded = Boolean(summary.data);
   const resolvedWindow = summary.data?.window || fallbackWindow;
@@ -549,6 +549,14 @@ export default function MetricsPage() {
                   </p>
 
                   <div className="mt-6 flex flex-wrap gap-3 text-sm text-[#5f5a4d]">
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="inline-flex items-center gap-2 rounded-full border border-black bg-black px-4 py-2 text-white transition-all hover:bg-transparent hover:text-black active:scale-95"
+                      aria-label="Refresh metrics data"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">refresh</span>
+                      <span className="font-medium">Refresh Board</span>
+                    </button>
                     {[
                       "Website Supabase primary",
                       "Last 7 days in Pacific time",
@@ -894,7 +902,11 @@ export default function MetricsPage() {
               <div className="mt-6 overflow-x-auto pb-2">
                 <div className="h-[300px] min-w-[620px] sm:h-[340px] sm:min-w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={businessSeries} margin={{ left: 0, right: 12 }}>
+                    <ComposedChart 
+                      data={businessSeries} 
+                      margin={{ left: 0, right: 12 }}
+                      aria-label="7-Day KPI Flow chart showing signups, onboarding, and profile confirmations"
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="#ede6d7" />
                       <XAxis
                         dataKey="date"
@@ -1154,7 +1166,11 @@ export default function MetricsPage() {
               <div className="overflow-x-auto pb-2">
                 <div className="h-[280px] min-w-[560px] sm:h-[300px] sm:min-w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={trafficSeries} margin={{ left: 0, right: 12 }}>
+                    <LineChart 
+                      data={trafficSeries} 
+                      margin={{ left: 0, right: 12 }}
+                      aria-label="7-Day traffic trend chart showing active users, sessions, and views"
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="#ede6d7" />
                       <XAxis
                         dataKey="date"
