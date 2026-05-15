@@ -31,7 +31,7 @@ const ViewPreferencesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box minH="100dvh" bg="#FFFFFF" display="flex" alignItems="center" justifyContent="center">
+      <Box minH="100dvh" bg="#FFFFFF" display="flex" alignItems="center" justifyContent="center" role="status" aria-live="polite">
         <Text>Loading profile...</Text>
       </Box>
     );
@@ -121,12 +121,14 @@ const ViewPreferencesPage: React.FC = () => {
           </Heading>
           <HStack spacing={2.5} flexWrap="wrap">
             {[
-              maskEmail(profileData.email),
-              `Age ${profileData.age}`,
-              maskPhone(profileData.phone_country_code, profileData.phone_number),
-            ].map((chip) => (
+              profileData.email ? maskEmail(profileData.email) : null,
+              profileData.age ? `Age ${profileData.age}` : null,
+              profileData.phone_number ? maskPhone(profileData.phone_country_code, profileData.phone_number) : null,
+            ]
+              .filter(Boolean)
+              .map((chip, index) => (
               <Box
-                key={chip}
+                key={index}
                 minH="34px"
                 px={3}
                 py={1.5}
@@ -172,11 +174,12 @@ const ViewPreferencesPage: React.FC = () => {
           <Box border="1px solid #E5E7EB" borderRadius="18px" bg="#FFFFFF" overflow="hidden">
             <Accordion allowToggle>
               {Object.entries(investorProfile).map(([fieldName, fieldData]: [string, any], idx) => {
+                if (!fieldData || typeof fieldData !== 'object') return null;
                 const label = FIELD_LABELS[fieldName as keyof typeof FIELD_LABELS] || fieldName;
                 const valueText = Array.isArray(fieldData.value)
                   ? fieldData.value.map((v: string) => VALUE_LABELS[v as keyof typeof VALUE_LABELS] || v).join(", ")
-                  : VALUE_LABELS[fieldData.value as keyof typeof VALUE_LABELS] || fieldData.value;
-                const pill = pillForConfidence(fieldData.confidence);
+                  : VALUE_LABELS[fieldData.value as keyof typeof VALUE_LABELS] || fieldData.value || "—";
+                const pill = pillForConfidence(fieldData.confidence || 0);
                 return (
                   <AccordionItem
                     key={fieldName}
