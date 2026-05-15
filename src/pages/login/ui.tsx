@@ -78,7 +78,7 @@ export default function LoginPage() {
             onClick={handleAppleSignIn}
             disabled={isSigningIn}
           >
-            <FaApple className="text-lg" />
+            <FaApple className="text-lg" aria-hidden="true" />
             <span>Continue with Apple</span>
           </HushhTechCta>
 
@@ -87,12 +87,12 @@ export default function LoginPage() {
             onClick={handleGoogleSignIn}
             disabled={isSigningIn}
           >
-            <FcGoogle className="text-lg" />
+            <FcGoogle className="text-lg" aria-hidden="true" />
             <span>Continue with Google</span>
           </HushhTechCta>
 
           {oauthError ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert" aria-live="assertive">
               <p>{oauthError}</p>
               {oauthFallbackUrl ? (
                 <a
@@ -121,8 +121,12 @@ export default function LoginPage() {
 
         {/* ── Trust Badges ── */}
         <section className="flex flex-col items-center justify-center text-center gap-2 pt-16 pb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-hushh-blue/5 border border-hushh-blue/10 mb-2">
+            <span className="material-symbols-outlined text-[14px] text-hushh-blue" aria-hidden="true">verified_user</span>
+            <span className="text-[10px] uppercase tracking-widest font-semibold text-hushh-blue/80">Secured by Hushh Identity</span>
+          </div>
           <div className="flex items-center gap-1">
-            <span className="material-symbols-outlined text-[12px] text-hushh-blue">
+            <span className="material-symbols-outlined text-[12px] text-hushh-blue" aria-hidden="true">
               lock
             </span>
             <span className="text-[10px] text-gray-400 tracking-wide uppercase font-medium">
