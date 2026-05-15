@@ -103,7 +103,7 @@ function PublicHushhProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-gray-50 to-[#f8fcff]">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-gray-50 to-[#f8fcff]" role="status" aria-live="polite">
         <p className="text-sm text-gray-500">Loading Hushh profile…</p>
       </div>
     );
@@ -190,11 +190,11 @@ function PublicHushhProfilePage() {
                 <p className="text-xs uppercase tracking-wide text-orange-600 font-bold">Food Preferences</p>
               </div>
               <p className="text-xl font-bold text-gray-900 mt-2 mb-1 truncate">
-                {formatList(preferences.food.favoriteCuisines)}
+                {formatList(preferences.food?.favoriteCuisines)}
               </p>
               <p className="text-xs text-gray-600 flex items-center gap-2">
-                <span className="px-2 py-0.5 bg-orange-100 rounded text-orange-700 font-medium">{preferences.food.dietType}</span>
-                <span className="px-2 py-0.5 bg-orange-100 rounded text-orange-700 font-medium">Spice: {preferences.food.spiceLevel}</span>
+                <span className="px-2 py-0.5 bg-orange-100 rounded text-orange-700 font-medium">{preferences.food?.dietType || "—"}</span>
+                <span className="px-2 py-0.5 bg-orange-100 rounded text-orange-700 font-medium">Spice: {preferences.food?.spiceLevel || "—"}</span>
               </p>
             </div>
           </div>
@@ -207,11 +207,11 @@ function PublicHushhProfilePage() {
                 <p className="text-xs uppercase tracking-wide text-blue-600 font-bold">Hotel Preferences</p>
               </div>
               <p className="text-xl font-bold text-gray-900 mt-2 mb-1 truncate">
-                {formatBudget(preferences.hotel.budgetPerNight)}
+                {formatBudget(preferences.hotel?.budgetPerNight)}
               </p>
               <p className="text-xs text-gray-600 flex items-center gap-2">
-                <span className="px-2 py-0.5 bg-blue-100 rounded text-blue-700 font-medium">{preferences.hotel.hotelClass}</span>
-                <span className="px-2 py-0.5 bg-blue-100 rounded text-blue-700 font-medium">{preferences.hotel.locationPreference}</span>
+                <span className="px-2 py-0.5 bg-blue-100 rounded text-blue-700 font-medium">{preferences.hotel?.hotelClass || "—"}</span>
+                <span className="px-2 py-0.5 bg-blue-100 rounded text-blue-700 font-medium">{preferences.hotel?.locationPreference || "—"}</span>
               </p>
             </div>
           </div>
@@ -224,11 +224,11 @@ function PublicHushhProfilePage() {
                 <p className="text-xs uppercase tracking-wide text-purple-600 font-bold">Brand Preferences</p>
               </div>
               <p className="text-xl font-bold text-gray-900 mt-2 mb-1 truncate">
-                {preferences.brand.fashionStyle}
+                {preferences.brand?.fashionStyle || "—"}
               </p>
               <p className="text-xs text-gray-600 flex items-center gap-2">
-                <span className="px-2 py-0.5 bg-purple-100 rounded text-purple-700 font-medium">{preferences.brand.techEcosystem}</span>
-                <span className="px-2 py-0.5 bg-purple-100 rounded text-purple-700 font-medium">{preferences.brand.priceSensitivity}</span>
+                <span className="px-2 py-0.5 bg-purple-100 rounded text-purple-700 font-medium">{preferences.brand?.techEcosystem || "—"}</span>
+                <span className="px-2 py-0.5 bg-purple-100 rounded text-purple-700 font-medium">{preferences.brand?.priceSensitivity || "—"}</span>
               </p>
             </div>
           </div>
@@ -249,55 +249,55 @@ function PublicHushhProfilePage() {
               title="Food Preferences"
               icon="🍽️"
               items={[
-                { label: "Diet Type", value: preferences.food.dietType },
-                { label: "Spice Level", value: preferences.food.spiceLevel },
-                { label: "Budget Level", value: preferences.food.budgetLevel },
-                { label: "Dining Out", value: preferences.food.eatingOutFrequency },
-                { label: "Favorite Cuisines", value: formatList(preferences.food.favoriteCuisines) },
+                { label: "Diet Type", value: preferences.food?.dietType || "—" },
+                { label: "Spice Level", value: preferences.food?.spiceLevel || "—" },
+                { label: "Budget Level", value: preferences.food?.budgetLevel || "—" },
+                { label: "Dining Out", value: preferences.food?.eatingOutFrequency || "—" },
+                { label: "Favorite Cuisines", value: formatList(preferences.food?.favoriteCuisines) },
               ]}
             />
             <PreferenceCard
               title="Beverage Preferences"
               icon="🍹"
               items={[
-                { label: "Alcohol", value: preferences.drink.alcoholPreference },
-                { label: "Alcohol Types", value: formatList(preferences.drink.favoriteAlcoholTypes) },
-                { label: "Non-Alcoholic", value: formatList(preferences.drink.favoriteNonAlcoholicTypes) },
-                { label: "Sugar Level", value: preferences.drink.sugarLevel },
-                { label: "Caffeine", value: preferences.drink.caffeineTolerance },
+                { label: "Alcohol", value: preferences.drink?.alcoholPreference || "—" },
+                { label: "Alcohol Types", value: formatList(preferences.drink?.favoriteAlcoholTypes) },
+                { label: "Non-Alcoholic", value: formatList(preferences.drink?.favoriteNonAlcoholicTypes) },
+                { label: "Sugar Level", value: preferences.drink?.sugarLevel || "—" },
+                { label: "Caffeine", value: preferences.drink?.caffeineTolerance || "—" },
               ]}
             />
             <PreferenceCard
               title="Accommodation"
               icon="🏨"
               items={[
-                { label: "Budget/Night", value: formatBudget(preferences.hotel.budgetPerNight) },
-                { label: "Hotel Class", value: preferences.hotel.hotelClass },
-                { label: "Location", value: preferences.hotel.locationPreference },
-                { label: "Room Type", value: preferences.hotel.roomType },
-                { label: "Amenities", value: formatList(preferences.hotel.amenitiesPriority) },
+                { label: "Budget/Night", value: formatBudget(preferences.hotel?.budgetPerNight) },
+                { label: "Hotel Class", value: preferences.hotel?.hotelClass || "—" },
+                { label: "Location", value: preferences.hotel?.locationPreference || "—" },
+                { label: "Room Type", value: preferences.hotel?.roomType || "—" },
+                { label: "Amenities", value: formatList(preferences.hotel?.amenitiesPriority) },
               ]}
             />
             <PreferenceCard
               title="Coffee Culture"
               icon="☕"
               items={[
-                { label: "Consumer Type", value: preferences.coffee.coffeeConsumerType },
-                { label: "Coffee Styles", value: formatList(preferences.coffee.coffeeStyle) },
-                { label: "Milk Choice", value: preferences.coffee.milkPreference },
-                { label: "Sweetness", value: preferences.coffee.sweetnessLevel },
-                { label: "Cafe Vibe", value: preferences.coffee.cafeAmbiencePreference },
+                { label: "Consumer Type", value: preferences.coffee?.coffeeConsumerType || "—" },
+                { label: "Coffee Styles", value: formatList(preferences.coffee?.coffeeStyle) },
+                { label: "Milk Choice", value: preferences.coffee?.milkPreference || "—" },
+                { label: "Sweetness", value: preferences.coffee?.sweetnessLevel || "—" },
+                { label: "Cafe Vibe", value: preferences.coffee?.cafeAmbiencePreference || "—" },
               ]}
             />
             <PreferenceCard
               title="Brand & Shopping"
               icon="🛍️"
               items={[
-                { label: "Fashion Style", value: preferences.brand.fashionStyle },
-                { label: "Tech Ecosystem", value: preferences.brand.techEcosystem },
-                { label: "Shopping", value: formatList(preferences.brand.shoppingChannels) },
-                { label: "Price Sensitivity", value: preferences.brand.priceSensitivity },
-                { label: "Brand Values", value: formatList(preferences.brand.brandValues) },
+                { label: "Fashion Style", value: preferences.brand?.fashionStyle || "—" },
+                { label: "Tech Ecosystem", value: preferences.brand?.techEcosystem || "—" },
+                { label: "Shopping", value: formatList(preferences.brand?.shoppingChannels) },
+                { label: "Price Sensitivity", value: preferences.brand?.priceSensitivity || "—" },
+                { label: "Brand Values", value: formatList(preferences.brand?.brandValues) },
               ]}
             />
           </div>
