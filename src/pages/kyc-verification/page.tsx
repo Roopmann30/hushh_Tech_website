@@ -19,7 +19,13 @@ const KYCVerificationPage = () => {
             <Text as="span" color={secondaryColor} fontWeight="500"> & KNOW YOUR CUSTOMER</Text>
           </Heading>
           <Heading as="h2" size="lg" color={secondaryColor} fontWeight="500">(KYC) DOCUMENTATION</Heading>
-          <Text mt={4} fontSize="md" color="gray.600">Hushh Renaissance Alpha & Alpha Fund, LP</Text>
+          <HStack justify="center" mt={4} spacing={3}>
+            <Text fontSize="md" color="gray.600">Hushh Renaissance Alpha & Alpha Fund, LP</Text>
+            <Badge colorScheme="blue" variant="subtle" borderRadius="full" px={3} py={1} fontSize="xs">
+              <Icon as={FiClock} mr={1} verticalAlign="middle" />
+              Processing: 5-10 Days
+            </Badge>
+          </HStack>
         </Box>
 
         {/* Documentation Requirements */}
@@ -36,33 +42,32 @@ const KYCVerificationPage = () => {
               <Box
                 w={10}
                 h={10}
-                align="center"
-                justify="center"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
                 rounded="md"
                 background={'linear-gradient(to right, #00A9E0, #6DD3EF)'}
                 mr={4}
+                aria-hidden="true"
               >
                 <Text fontWeight="500" fontSize="lg" color="white">1</Text>
               </Box>
               <Heading as="h3" size="md" fontWeight="500">Identity Verification</Heading>
             </Stack>
-            <VStack align="start" pl={14} spacing={3}>
-              <HStack align="center">
+            <VStack align="start" pl={14} spacing={3} role="list">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Government-issued photo identification (passport, driver's license, or national ID)</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Proof of address (utility bill, bank statement, or lease agreement dated within 3 months)</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
@@ -88,26 +93,26 @@ const KYCVerificationPage = () => {
               </Box>
               <Heading as="h3" size="md" fontWeight="500">Financial Background Verification</Heading>
             </Stack>
-            <VStack align="start" pl={14} spacing={3}>
-              <HStack align="center">
+            <VStack align="start" pl={14} spacing={3} role="list">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                 <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Bank statements from the last 3 months</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Tax returns for the previous 2 years</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Employment verification or business ownership documentation</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
@@ -133,20 +138,20 @@ const KYCVerificationPage = () => {
               </Box>
               <Heading as="h3" size="md" fontWeight="500">Investment Experience Documentation</Heading>
             </Stack>
-            <VStack align="start" pl={14} spacing={3}>
-              <HStack align="center">
+            <VStack align="start" pl={14} spacing={3} role="list">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Investment portfolio statements or history</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Accredited investor certification (if applicable)</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
@@ -172,20 +177,20 @@ const KYCVerificationPage = () => {
               </Box>
               <Heading as="h3" size="md" fontWeight="500">Enhanced Due Diligence (High-Risk Categories)</Heading>
             </Stack>
-            <VStack align="start" pl={14} spacing={3}>
-              <HStack align="center">
+            <VStack align="start" pl={14} spacing={3} role="list">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Politically Exposed Persons (PEP) screening</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Sanctions list verification (OFAC, UN, EU, etc.)</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
@@ -211,26 +216,26 @@ const KYCVerificationPage = () => {
               </Box>
               <Heading as="h3" size="md" fontWeight="500">Corporate Entity Verification (For Institutional Investors)</Heading>
             </Stack>
-            <VStack align="start" pl={14} spacing={3}>
-              <HStack align="center">
+            <VStack align="start" pl={14} spacing={3} role="list">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Articles of incorporation or formation documents</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Board resolutions authorizing investment</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Beneficial ownership disclosure (25% threshold)</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
@@ -256,20 +261,20 @@ const KYCVerificationPage = () => {
               </Box>
               <Heading as="h3" size="md" fontWeight="500">Ongoing Monitoring Requirements</Heading>
             </Stack>
-            <VStack align="start" pl={14} spacing={3}>
-              <HStack align="center">
+            <VStack align="start" pl={14} spacing={3} role="list">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Annual KYC refresh and document updates</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Transaction monitoring and suspicious activity reporting</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
@@ -295,26 +300,26 @@ const KYCVerificationPage = () => {
               </Box>
               <Heading as="h3" size="md" fontWeight="500">Prohibited Activities & Red Flags</Heading>
             </Stack>
-            <VStack align="start" pl={14} spacing={3}>
-              <HStack align="center">
+            <VStack align="start" pl={14} spacing={3} role="list">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Cash transactions above $10,000</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Funds from sanctioned countries or entities</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Structuring transactions to avoid reporting requirements</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                     <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
@@ -340,26 +345,26 @@ const KYCVerificationPage = () => {
               </Box>
               <Heading as="h3" size="md" fontWeight="500">Documentation Timeline & Process</Heading>
             </Stack>
-            <VStack align="start" pl={14} spacing={3}>
-              <HStack align="center">
+            <VStack align="start" pl={14} spacing={3} role="list">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Initial KYC completion required before fund admission</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Standard processing time: 5-10 business days</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
                 <Text>Enhanced due diligence may require additional 10-15 business days</Text>
               </HStack>
-              <HStack align="center">
+              <HStack align="center" role="listitem">
                 <Box w={6} display="flex" justifyContent="center">
                   <Icon as={FiCheck} color="green.500" boxSize={4} />
                 </Box>
