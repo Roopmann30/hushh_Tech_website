@@ -119,6 +119,33 @@ describe("AuthSessionProvider", () => {
     vi.clearAllMocks();
     Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
+    // Mock storage
+    const storageMock = () => {
+      let storage: Record<string, string> = {};
+      return {
+        getItem: vi.fn((key: string) => storage[key] || null),
+        setItem: vi.fn((key: string, value: string) => { storage[key] = value; }),
+        removeItem: vi.fn((key: string) => { delete storage[key]; }),
+        clear: vi.fn(() => { storage = {}; }),
+        length: 0,
+        key: vi.fn((index: number) => Object.keys(storage)[index] || null),
+      };
+    };
+
+    const mockLocalStorage = storageMock();
+    const mockSessionStorage = storageMock();
+
+    Object.defineProperty(window, "localStorage", {
+      value: mockLocalStorage,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, "sessionStorage", {
+      value: mockSessionStorage,
+      writable: true,
+      configurable: true,
+    });
+
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
@@ -272,6 +299,34 @@ describe("HushhTechNavDrawer auth gating", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+    // Mock storage
+    const storageMock = () => {
+      let storage: Record<string, string> = {};
+      return {
+        getItem: vi.fn((key: string) => storage[key] || null),
+        setItem: vi.fn((key: string, value: string) => { storage[key] = value; }),
+        removeItem: vi.fn((key: string) => { delete storage[key]; }),
+        clear: vi.fn(() => { storage = {}; }),
+        length: 0,
+        key: vi.fn((index: number) => Object.keys(storage)[index] || null),
+      };
+    };
+
+    const mockLocalStorage = storageMock();
+    const mockSessionStorage = storageMock();
+
+    Object.defineProperty(window, "localStorage", {
+      value: mockLocalStorage,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, "sessionStorage", {
+      value: mockSessionStorage,
+      writable: true,
+      configurable: true,
+    });
+
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
@@ -431,6 +486,34 @@ describe("auth-aware guest routing", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+    // Mock storage
+    const storageMock = () => {
+      let storage: Record<string, string> = {};
+      return {
+        getItem: vi.fn((key: string) => storage[key] || null),
+        setItem: vi.fn((key: string, value: string) => { storage[key] = value; }),
+        removeItem: vi.fn((key: string) => { delete storage[key]; }),
+        clear: vi.fn(() => { storage = {}; }),
+        length: 0,
+        key: vi.fn((index: number) => Object.keys(storage)[index] || null),
+      };
+    };
+
+    const mockLocalStorage = storageMock();
+    const mockSessionStorage = storageMock();
+
+    Object.defineProperty(window, "localStorage", {
+      value: mockLocalStorage,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, "sessionStorage", {
+      value: mockSessionStorage,
+      writable: true,
+      configurable: true,
+    });
+
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
