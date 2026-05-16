@@ -45,7 +45,9 @@ describe("metrics MetricCard accessibility", () => {
     await renderMetricCard();
 
     const valueHeading = container.querySelector("h3");
-    const visibleLabel = container.querySelector("p.mt-2");
+    const visibleLabel = container.querySelector(
+      '[data-testid="metric-label-value-stack"] p'
+    );
 
     expect(valueHeading?.getAttribute("aria-label")).toBe("Total users: 1,234");
     expect(visibleLabel?.textContent).toBe("Total users");
