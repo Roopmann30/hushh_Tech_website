@@ -10,7 +10,7 @@
  * Backend logic unchanged: auth session, onboarding status, navigation.
  */
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Box, Text, Flex, Spinner, Image } from "@chakra-ui/react";
 import config from "../resources/config/config";
 import { Session } from "@supabase/supabase-js";
@@ -35,17 +35,7 @@ const IOS = {
 };
 
 /* ─── Inline SVG Icons (no external deps) ─── */
-const PsychologyIcon = () => (
-  <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.22.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill={IOS.blue} opacity="0.8"/>
-  </svg>
-);
 
-const SparkIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-    <path d="M12 2L14.09 8.26L20 9.27L15.55 13.97L16.91 20L12 16.9L7.09 20L8.45 13.97L4 9.27L9.91 8.26L12 2Z" fill="white"/>
-  </svg>
-);
 
 const ShieldIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -109,6 +99,7 @@ const StrategyItem = ({ icon, iconBg, title, subtitle, isLast = false }: {
     borderColor="rgba(198,198,200,0.4)"
     cursor="pointer"
     transition="background 0.15s"
+    _hover={{ bg: "rgba(0,0,0,0.02)" }}
     _active={{ bg: "#D1D1D6" }}
   >
     <Flex
@@ -187,7 +178,7 @@ export default function Hero() {
   useEffect(() => {
     async function checkUserStatus() {
       if (!session?.user?.id || !config.supabaseClient) {
-        setOnboardingStatus(prev => ({ ...prev, loading: false }));
+        setOnboardingStatus(prev => prev.loading ? { ...prev, loading: false } : prev);
         return;
       }
 
@@ -216,15 +207,11 @@ export default function Hero() {
       }
     }
 
-    if (session?.user?.id) {
-      checkUserStatus();
-    } else {
-      setOnboardingStatus(prev => ({ ...prev, loading: false }));
-    }
+    checkUserStatus();
   }, [session?.user?.id]);
 
   /* Dynamic CTA based on auth + onboarding state */
-  const getPrimaryCTA = () => {
+  const primaryCTA = useMemo(() => {
     if (!session) {
       return { text: "Complete Your Hushh Profile", action: () => navigate(FINANCIAL_LINK_ROUTE), loading: false };
     }
@@ -242,10 +229,8 @@ export default function Hero() {
         loading: false,
       };
     }
-    return { text: "Complete Your Hushh Profile", action: () => navigate("/onboarding/financial-link"), loading: false };
-  };
-
-  const primaryCTA = getPrimaryCTA();
+    return { text: "Complete Your Hushh Profile", action: () => navigate(FINANCIAL_LINK_ROUTE), loading: false };
+  }, [session, onboardingStatus, navigate]);
 
   /* ─── RENDER ─── */
   return (
@@ -359,7 +344,7 @@ export default function Hero() {
               _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
               onClick={primaryCTA.action}
               aria-label={primaryCTA.text}
-              {...(primaryCTA.loading ? { opacity: 0.6 } : {})}
+              isDisabled={primaryCTA.loading}
             >
               {primaryCTA.loading ? <Spinner size="sm" color="white" /> : primaryCTA.text}
             </Box>
@@ -529,13 +514,13 @@ export default function Hero() {
       >
         <Flex justify="space-between" align="center" maxW={{ base: "393px", md: "768px", lg: "1024px" }} mx="auto">
           <TabItem icon="home" label="Home" active />
-          <Box onClick={() => navigate("/hushh-user-profile")} cursor="pointer">
+          <Box onClick={() => navigate("/hushh-user-profile")} cursor="pointer" role="button" aria-label="View Portfolio">
             <TabItem icon="pie_chart" label="Portfolio" />
           </Box>
-          <Box onClick={() => navigate("/discover-fund-a")} cursor="pointer">
+          <Box onClick={() => navigate("/discover-fund-a")} cursor="pointer" role="button" aria-label="Trade Assets">
             <TabItem icon="swap_horiz" label="Trade" />
           </Box>
-          <Box onClick={() => session ? navigate("/hushh-user-profile") : navigate("/login")} cursor="pointer">
+          <Box onClick={() => session ? navigate("/hushh-user-profile") : navigate("/login")} cursor="pointer" role="button" aria-label="User Profile">
             <TabItem icon="person" label="Profile" />
           </Box>
         </Flex>
