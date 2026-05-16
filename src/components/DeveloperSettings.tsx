@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { useClipboard } from "@chakra-ui/react";
-import { Copy, Check, Terminal, Code as CodeIcon, ChevronDown, ChevronUp, Zap, ExternalLink } from "lucide-react";
-import hushhLogo from './images/Hushhogo.png';
+import { Copy, Check, Terminal, Code as CodeIcon, Zap, ExternalLink } from "lucide-react";
+// import hushhLogo from './images/Hushhogo.png'; // Not used in this component currently
 
 interface EndpointCardProps {
   title: string;
@@ -14,12 +14,12 @@ const EndpointCard: React.FC<EndpointCardProps> = ({ title, description, endpoin
   const { hasCopied, onCopy } = useClipboard(endpoint);
 
   return (
-    <div className="bg-[#F9FAFB] rounded-xl p-4 border border-[#E5E7EB] hover:border-[#CBD5E1] hover:shadow-sm transition-all">
+    <div className="bg-[#F9FAFB] rounded-xl p-4 border border-[#E5E7EB] hover:border-[#CBD5E1] hover:shadow-md transition-all duration-300">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span 
-              className={`px-2 py-0.5 text-[11px] font-semibold rounded-md ${
+              className={`px-2 py-0.5 text-[11px] font-bold rounded-md tracking-wider uppercase ${
                 method === "POST" 
                   ? "bg-amber-100 text-amber-800" 
                   : "bg-blue-100 text-blue-800"
@@ -27,27 +27,29 @@ const EndpointCard: React.FC<EndpointCardProps> = ({ title, description, endpoin
             >
               {method}
             </span>
-            <span className="text-[15px] font-medium text-[#111827]">{title}</span>
+            <span className="text-[15px] font-bold text-[#111827]">{title}</span>
           </div>
-          <p className="text-[13px] text-[#6B7280] leading-relaxed">{description}</p>
+          <p className="text-[13px] text-[#6B7280] font-medium leading-relaxed">{description}</p>
         </div>
       </div>
       
-      <div className="bg-white rounded-lg border border-[#E5E7EB] p-3">
-        <div className="flex items-center gap-2">
-          <code className="flex-1 text-[12px] text-[#0F172A] font-mono break-all whitespace-pre-wrap">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-3 shadow-sm group/code relative overflow-hidden">
+        <div className="absolute inset-y-0 left-0 w-1 bg-indigo-500 opacity-0 group-hover/code:opacity-100 transition-opacity" />
+        <div className="flex items-center gap-3">
+          <code className="flex-1 text-[12px] text-[#0F172A] font-mono break-all whitespace-pre-wrap select-all">
             {endpoint}
           </code>
           <button
             onClick={onCopy}
-            className={`shrink-0 p-2 rounded-lg transition-colors ${
+            className={`shrink-0 p-2.5 rounded-lg transition-all active:scale-95 ${
               hasCopied 
-                ? "bg-green-50 text-green-600" 
-                : "hover:bg-slate-100 text-slate-400"
+                ? "bg-green-100 text-green-700 shadow-sm" 
+                : "bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-200"
             }`}
-            aria-label="Copy endpoint"
+            aria-label={hasCopied ? "Endpoint URL copied" : "Copy endpoint URL to clipboard"}
+            title={hasCopied ? "Copied!" : "Copy to clipboard"}
           >
-            {hasCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            {hasCopied ? <Check className="w-4 h-4" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
           </button>
         </div>
       </div>
@@ -64,9 +66,9 @@ const DeveloperAvatar = ({ size = 'lg' }: { size?: 'sm' | 'md' | 'lg' }) => {
   };
 
   return (
-    <div className="relative">
-      <div className={`${sizeClasses[size]} rounded-full overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg border-2 border-indigo-500/20 flex items-center justify-center`}>
-        <Terminal className={`${size === 'lg' ? 'w-10 h-10' : 'w-5 h-5'} text-white`} />
+    <div className="relative" aria-hidden="true">
+      <div className={`${sizeClasses[size]} rounded-full overflow-hidden bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 shadow-lg border-2 border-indigo-500/20 flex items-center justify-center animate-in fade-in zoom-in duration-500`}>
+        <Terminal className={`${size === 'lg' ? 'w-10 h-10' : 'w-5 h-5'} text-white drop-shadow-md`} />
       </div>
     </div>
   );
@@ -79,7 +81,7 @@ interface DeveloperSettingsProps {
 const DeveloperSettings: React.FC<DeveloperSettingsProps> = ({ investorSlug }) => {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '{VITE_SUPABASE_URL}';
   
-  const endpoints = [
+  const endpoints = React.useMemo(() => [
     {
       title: "MCP Discovery Endpoint",
       description: "Get available MCP tools and resources for agent-to-agent communication",
@@ -104,7 +106,7 @@ const DeveloperSettings: React.FC<DeveloperSettingsProps> = ({ investorSlug }) =
         : `${supabaseUrl}/functions/v1/investor-agent-mcp/a2a/agent-card.json?slug={investor-slug}`,
       method: "GET",
     },
-  ];
+  ], [investorSlug, supabaseUrl]);
 
   return (
     <div 
@@ -123,17 +125,18 @@ const DeveloperSettings: React.FC<DeveloperSettingsProps> = ({ investorSlug }) =
           </div>
           <button 
             onClick={() => window.open('https://docs.hushh.ai', '_blank')}
-            className="flex items-center justify-center px-3 py-2 rounded-lg text-[#2B8CEE] hover:bg-blue-50 transition-colors text-sm font-medium gap-1"
+            className="flex items-center justify-center px-4 py-2 rounded-lg text-[#2B8CEE] hover:bg-blue-50 transition-all text-sm font-semibold gap-1.5 border border-transparent hover:border-blue-100"
+            aria-label="Open developer documentation"
           >
             <span>Docs</span>
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
         
         {/* Status Badge */}
         <div className="px-4 pb-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-500/5 text-purple-600 text-sm font-semibold">
-            <Zap className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-500/5 text-purple-600 text-xs font-bold uppercase tracking-wider">
+            <Zap className="w-3.5 h-3.5 fill-purple-600" aria-hidden="true" />
             <span>MCP & A2A Ready</span>
           </div>
         </div>
@@ -143,10 +146,10 @@ const DeveloperSettings: React.FC<DeveloperSettingsProps> = ({ investorSlug }) =
       <main className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth">
         
         {/* Intro Section - matching chat empty state */}
-        <div className="flex flex-col items-center justify-center mb-8 mt-2">
+        <div className="flex flex-col items-center justify-center mb-10 mt-2">
           {/* Avatar with glow effect */}
-          <div className="relative mb-6 group cursor-pointer">
-            <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-2xl opacity-40 animate-pulse" />
             <div className="relative">
               <DeveloperAvatar size="lg" />
             </div>
