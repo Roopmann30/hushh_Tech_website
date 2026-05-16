@@ -10,7 +10,7 @@
  * Backend logic unchanged: auth session, onboarding status, navigation.
  */
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Box, Text, Flex, Spinner, Image } from "@chakra-ui/react";
 import config from "../resources/config/config";
 import { Session } from "@supabase/supabase-js";
@@ -109,6 +109,7 @@ const StrategyItem = ({ icon, iconBg, title, subtitle, isLast = false }: {
     borderColor="rgba(198,198,200,0.4)"
     cursor="pointer"
     transition="background 0.15s"
+    _hover={{ bg: "rgba(0,0,0,0.02)" }}
     _active={{ bg: "#D1D1D6" }}
   >
     <Flex
@@ -194,7 +195,7 @@ export default function Hero() {
       try {
         const { data: profile, error: profileError } = await config.supabaseClient
           .from('investor_profiles')
-          .select('id, user_confirmed')
+          .select('id')
           .eq('user_id', session.user.id)
           .maybeSingle();
 
@@ -224,7 +225,7 @@ export default function Hero() {
   }, [session?.user?.id]);
 
   /* Dynamic CTA based on auth + onboarding state */
-  const getPrimaryCTA = () => {
+  const primaryCTA = useMemo(() => {
     if (!session) {
       return { text: "Complete Your Hushh Profile", action: () => navigate(FINANCIAL_LINK_ROUTE), loading: false };
     }
@@ -242,10 +243,8 @@ export default function Hero() {
         loading: false,
       };
     }
-    return { text: "Complete Your Hushh Profile", action: () => navigate("/onboarding/financial-link"), loading: false };
-  };
-
-  const primaryCTA = getPrimaryCTA();
+    return { text: "Complete Your Hushh Profile", action: () => navigate(FINANCIAL_LINK_ROUTE), loading: false };
+  }, [session, onboardingStatus, navigate]);
 
   /* ─── RENDER ─── */
   return (
@@ -359,7 +358,7 @@ export default function Hero() {
               _disabled={{ opacity: 0.6, cursor: "not-allowed" }}
               onClick={primaryCTA.action}
               aria-label={primaryCTA.text}
-              {...(primaryCTA.loading ? { opacity: 0.6 } : {})}
+              isDisabled={primaryCTA.loading}
             >
               {primaryCTA.loading ? <Spinner size="sm" color="white" /> : primaryCTA.text}
             </Box>
@@ -529,13 +528,13 @@ export default function Hero() {
       >
         <Flex justify="space-between" align="center" maxW={{ base: "393px", md: "768px", lg: "1024px" }} mx="auto">
           <TabItem icon="home" label="Home" active />
-          <Box onClick={() => navigate("/hushh-user-profile")} cursor="pointer">
+          <Box onClick={() => navigate("/hushh-user-profile")} cursor="pointer" role="button" aria-label="View Portfolio">
             <TabItem icon="pie_chart" label="Portfolio" />
           </Box>
-          <Box onClick={() => navigate("/discover-fund-a")} cursor="pointer">
+          <Box onClick={() => navigate("/discover-fund-a")} cursor="pointer" role="button" aria-label="Trade Assets">
             <TabItem icon="swap_horiz" label="Trade" />
           </Box>
-          <Box onClick={() => session ? navigate("/hushh-user-profile") : navigate("/login")} cursor="pointer">
+          <Box onClick={() => session ? navigate("/hushh-user-profile") : navigate("/login")} cursor="pointer" role="button" aria-label="User Profile">
             <TabItem icon="person" label="Profile" />
           </Box>
         </Flex>
