@@ -40,6 +40,7 @@ const EndpointCard: React.FC<EndpointCardProps> = ({ title, description, endpoin
             {endpoint}
           </code>
           <button
+            type="button"
             onClick={onCopy}
             className={`shrink-0 p-2.5 rounded-lg transition-all active:scale-95 ${
               hasCopied 
@@ -48,6 +49,7 @@ const EndpointCard: React.FC<EndpointCardProps> = ({ title, description, endpoin
             }`}
             aria-label={hasCopied ? "Endpoint URL copied" : "Copy endpoint URL to clipboard"}
             title={hasCopied ? "Copied!" : "Copy to clipboard"}
+            aria-label={`${hasCopied ? "Copied" : "Copy"} ${title}`}
           >
             {hasCopied ? <Check className="w-4 h-4" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
           </button>
