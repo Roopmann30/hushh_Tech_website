@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import ReactMarkdown from 'react-markdown';
 import { Settings, Zap, ArrowUp } from 'lucide-react';
@@ -20,7 +20,7 @@ interface AccessInfo {
 }
 
 // Hushh Assistant Avatar Component - Uses official Hushh logo
-const HushhAvatar = ({ size = 'md', showOnline = false }: { size?: 'sm' | 'md' | 'lg'; showOnline?: boolean }) => {
+const HushhAvatar = React.memo(({ size = 'md', showOnline = false }: { size?: 'sm' | 'md' | 'lg'; showOnline?: boolean }) => {
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
@@ -28,11 +28,11 @@ const HushhAvatar = ({ size = 'md', showOnline = false }: { size?: 'sm' | 'md' |
   };
 
   return (
-    <div className="relative">
+    <div className="relative" aria-hidden="true">
       <div className={`${sizeClasses[size]} rounded-full overflow-hidden bg-white shadow-lg border-2 border-[#2B8CEE]/20 flex items-center justify-center`}>
         <img 
           src={hushhLogo}
-          alt="Hushh Assistant"
+          alt=""
           className="w-[85%] h-[85%] object-contain"
         />
       </div>
@@ -41,7 +41,9 @@ const HushhAvatar = ({ size = 'md', showOnline = false }: { size?: 'sm' | 'md' |
       )}
     </div>
   );
-};
+});
+
+HushhAvatar.displayName = 'HushhAvatar';
 
 export function InvestorChatWidget({ slug, investorName }: { slug: string; investorName: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -54,12 +56,6 @@ export function InvestorChatWidget({ slug, investorName }: { slug: string; inves
   const toast = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Check access on mount and handle payment success
-  useEffect(() => {
-    checkAccess();
-    handlePaymentReturn();
-  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -74,7 +70,7 @@ export function InvestorChatWidget({ slug, investorName }: { slug: string; inves
     }
   }, [input]);
 
-  const checkAccess = async () => {
+  const checkAccess = React.useCallback(async () => {
     try {
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-check-access`,
@@ -95,9 +91,9 @@ export function InvestorChatWidget({ slug, investorName }: { slug: string; inves
     } catch (err) {
       console.error('Access check error:', err);
     }
-  };
+  }, [visitorId, slug]);
 
-  const handlePaymentReturn = async () => {
+  const handlePaymentReturn = React.useCallback(async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment');
     const sessionId = urlParams.get('session_id');
@@ -138,7 +134,16 @@ export function InvestorChatWidget({ slug, investorName }: { slug: string; inves
       });
       window.history.replaceState({}, '', window.location.pathname);
     }
-  };
+  }, [visitorId, slug, toast, checkAccess]);
+
+  // Check access on mount and handle payment success
+  useEffect(() => {
+    const init = async () => {
+      await checkAccess();
+      await handlePaymentReturn();
+    };
+    init();
+  }, [checkAccess, handlePaymentReturn]);
 
   const handlePayment = async () => {
     setProcessing(true);
@@ -342,55 +347,57 @@ export function InvestorChatWidget({ slug, investorName }: { slug: string; inves
           )}
 
           {/* Messages */}
-          {messages.map((msg, i) => (
-            <div key={i}>
-              {msg.role === 'assistant' ? (
-                /* Assistant Message */
-                <div className="flex gap-3 items-end mb-6">
-                  <div className="shrink-0 self-start mt-1">
-                    <HushhAvatar size="sm" />
-                  </div>
-                  <div className="flex flex-col gap-1 max-w-[85%]">
-                    <span className="text-xs font-semibold text-[#2B8CEE] ml-1 mb-0.5">
-                      Hushh Assistant
-                    </span>
-                    <div className="bg-[#F6F8FA] text-slate-900 px-4 py-3 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm">
-                      <div 
-                        className="text-[15px] leading-relaxed prose prose-sm max-w-none"
-                        style={{
-                          '--tw-prose-body': '#1e293b',
-                          '--tw-prose-headings': '#0f172a',
-                        } as React.CSSProperties}
-                      >
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+          <ul className="flex flex-col gap-0 list-none p-0" aria-live="polite">
+            {messages.map((msg, i) => (
+              <li key={i} className="flex flex-col">
+                {msg.role === 'assistant' ? (
+                  /* Assistant Message */
+                  <div className="flex gap-3 items-end mb-6">
+                    <div className="shrink-0 self-start mt-1">
+                      <HushhAvatar size="sm" />
+                    </div>
+                    <div className="flex flex-col gap-1 max-w-[85%]">
+                      <span className="text-xs font-semibold text-[#2B8CEE] ml-1 mb-0.5">
+                        Hushh Assistant
+                      </span>
+                      <div className="bg-[#F6F8FA] text-slate-900 px-4 py-3 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm">
+                        <div 
+                          className="text-[15px] leading-relaxed prose prose-sm max-w-none"
+                          style={{
+                            '--tw-prose-body': '#1e293b',
+                            '--tw-prose-headings': '#0f172a',
+                          } as React.CSSProperties}
+                        >
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
                       </div>
+                      {msg.timestamp && (
+                        <span className="text-xs text-slate-400 ml-1 mt-0.5">{msg.timestamp}</span>
+                      )}
                     </div>
-                    {msg.timestamp && (
-                      <span className="text-xs text-slate-400 ml-1 mt-0.5">{msg.timestamp}</span>
-                    )}
                   </div>
-                </div>
-              ) : (
-                /* User Message */
-                <div className="flex gap-3 items-end mb-6 justify-end">
-                  <div className="flex flex-col gap-1 max-w-[85%] items-end">
-                    <div className="bg-[#2B8CEE] text-white px-4 py-3 rounded-2xl rounded-tr-none shadow-sm shadow-blue-500/20">
-                      <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
-                        {msg.content}
-                      </p>
+                ) : (
+                  /* User Message */
+                  <div className="flex gap-3 items-end mb-6 justify-end">
+                    <div className="flex flex-col gap-1 max-w-[85%] items-end">
+                      <div className="bg-[#2B8CEE] text-white px-4 py-3 rounded-2xl rounded-tr-none shadow-sm shadow-blue-500/20">
+                        <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
+                          {msg.content}
+                        </p>
+                      </div>
+                      {msg.timestamp && (
+                        <span className="text-xs text-slate-400 mr-1 mt-0.5">{msg.timestamp}</span>
+                      )}
                     </div>
-                    {msg.timestamp && (
-                      <span className="text-xs text-slate-400 mr-1 mt-0.5">{msg.timestamp}</span>
-                    )}
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </li>
+            ))}
+          </ul>
 
           {/* Loading indicator */}
           {loading && (
-            <div className="flex gap-3 items-end mb-6">
+            <div className="flex gap-3 items-end mb-6" aria-label="Hushh Assistant is thinking">
               <div className="shrink-0 self-start mt-1">
                 <HushhAvatar size="sm" />
               </div>
@@ -400,7 +407,7 @@ export function InvestorChatWidget({ slug, investorName }: { slug: string; inves
                 </span>
                 <div className="bg-[#F6F8FA] text-slate-500 px-4 py-3 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm">
                   <div className="flex items-center gap-2">
-                    <div className="flex gap-1">
+                    <div className="flex gap-1" aria-hidden="true">
                       <span className="w-2 h-2 bg-[#2B8CEE] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                       <span className="w-2 h-2 bg-[#2B8CEE] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                       <span className="w-2 h-2 bg-[#2B8CEE] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
