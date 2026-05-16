@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FiMenu, FiX, FiChevronDown, FiUser, FiTrash2, FiChevronDown as FiArrowDown } from "react-icons/fi";
+import { FiMenu, FiX } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { Image, useToast, useBreakpointValue, useDisclosure } from "@chakra-ui/react";
 import hushhLogo from "../components/images/Hushhogo.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 import DeleteAccountModal from "./DeleteAccountModal";
-import { useStockQuotes, StockQuote, STOCK_LOGOS } from "../hooks/useStockQuotes";
+import { useStockQuotes, StockQuote } from "../hooks/useStockQuotes";
 import config from "../resources/config/config";
 import { useAuthSession } from "../auth/AuthSessionProvider";
 import { SkipToContentLink } from "./ui/SkipToContentLink";
@@ -16,27 +16,32 @@ const WELCOME_TOAST_USER_KEY = "showWelcomeToastUserId";
 
 // Chip-based ticker component - Light theme design
 const TickerChip = ({ quote, isLoading }: { quote: StockQuote; isLoading?: boolean }) => {
+  const label = `${quote.displaySymbol}: ${quote.isUp ? 'Up' : 'Down'} ${Math.abs(quote.percentChange).toFixed(1)}%`;
   return (
-    <div className="group flex h-10 shrink-0 items-center gap-2 rounded-full bg-white border border-gray-200 shadow-sm pl-2 pr-3.5 hover:shadow-md transition-all">
+    <div 
+      role="text"
+      aria-label={label}
+      className="group flex h-10 shrink-0 items-center gap-2 rounded-full bg-white border border-gray-200 shadow-sm pl-2 pr-3.5 hover:shadow-md transition-all focus-within:ring-2 focus-within:ring-blue-500 outline-none"
+    >
       {/* Logo in gray circle */}
       <div className="flex w-7 h-7 items-center justify-center rounded-full bg-gray-100 shrink-0 overflow-hidden">
         {quote.logo ? (
           <img
             src={quote.logo}
-            alt={`${quote.displaySymbol} logo`}
+            alt=""
             className="w-4 h-4 object-contain"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
         ) : (
-          <span className="text-[10px] font-bold text-gray-600">{quote.displaySymbol.charAt(0)}</span>
+          <span className="text-[10px] font-bold text-gray-600" aria-hidden="true">{quote.displaySymbol.charAt(0)}</span>
         )}
       </div>
       {/* Stock symbol - use displaySymbol for cleaner display */}
-      <span className="text-[12px] font-bold text-gray-800 leading-none">{quote.displaySymbol}</span>
+      <span className="text-[12px] font-bold text-gray-800 leading-none" aria-hidden="true">{quote.displaySymbol}</span>
       {/* Percent change with arrow */}
-      <div className={`ml-0.5 flex items-center gap-0.5 ${quote.isUp ? 'text-green-600' : 'text-red-500'}`}>
+      <div className={`ml-0.5 flex items-center gap-0.5 ${quote.isUp ? 'text-green-600' : 'text-red-500'}`} aria-hidden="true">
         <span className="text-[10px]">{quote.isUp ? '▲' : '▼'}</span>
         <span className={`text-[11px] font-semibold ${isLoading ? 'animate-pulse' : ''}`}>
           {Math.abs(quote.percentChange).toFixed(1)}%
@@ -47,21 +52,16 @@ const TickerChip = ({ quote, isLoading }: { quote: StockQuote; isLoading?: boole
 };
 
 export default function Navbar() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [toastShown, setToastShown] = useState(false);
   const previousUserIdRef = useRef<string | null>(null);
-  const [careerDropdownOpen, setCareerDropdownOpen] = useState(false);
-  const [mobileCareerDropdownOpen, setMobileCareerDropdownOpen] = useState(false);
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
   const navigate = useNavigate();
   const location = useLocation();
   const drawerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const careerDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
-  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
   const [hushhCoins, setHushhCoins] = useState<number | null>(null);
   const toast = useToast();
   const isMobile = useBreakpointValue({ base: true, lg: false });
@@ -100,7 +100,7 @@ export default function Navbar() {
     const accountJustDeleted = localStorage.getItem("accountJustDeleted");
     if (accountJustDeleted === "true") {
       localStorage.removeItem("accountJustDeleted");
-      setToastShown(true);
+      setTimeout(() => setToastShown(true), 0);
       return;
     }
 
@@ -110,7 +110,7 @@ export default function Navbar() {
     const isPendingForCurrentUser = shouldShowWelcomeToast && (!pendingToastUserId || pendingToastUserId === currentUserId);
 
     if (!isPendingForCurrentUser) {
-      setToastShown(true);
+      setTimeout(() => setToastShown(true), 0);
       return;
     }
     
@@ -123,12 +123,15 @@ export default function Navbar() {
     });
     sessionStorage.removeItem(WELCOME_TOAST_PENDING_KEY);
     sessionStorage.removeItem(WELCOME_TOAST_USER_KEY);
-    setToastShown(true);
+    setTimeout(() => setToastShown(true), 0);
   }, [session, toastShown, toast, t, user?.id]);
 
   // Fetch Hushh Coins balance when authenticated
   useEffect(() => {
-    if (!user?.id || !config.supabaseClient) { setHushhCoins(null); return; }
+    if (!user?.id || !config.supabaseClient) { 
+      setTimeout(() => setHushhCoins(null), 0);
+      return; 
+    }
     const fetchCoins = async () => {
       try {
         const { data } = await config.supabaseClient!
@@ -176,10 +179,6 @@ export default function Navbar() {
     };
   }, []);
 
-  const toggleProfileDropdown = () => {
-    setProfileDropdownOpen((prev) => !prev);
-  };
-
   const handleAccountDeleted = () => {
     // Reset states immediately for proper UI update
     setToastShown(true); // Prevent welcome toast from showing
@@ -191,13 +190,6 @@ export default function Navbar() {
       navigate("/");
     }, 100);
   };
-
-  // Handle scroll to check if user reached bottom of menu
-  const handleMenuScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-    const isNearBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 50;
-    setShowScrollIndicator(!isNearBottom);
-  }, []);
 
   // Check if menu needs scroll indicator when drawer opens
   useEffect(() => {
@@ -238,9 +230,9 @@ export default function Navbar() {
             {primaryNavLinks.map(({ path, label }) => {
               const active = isActive(path);
               return (
-                <button
+                <Link
                   key={path}
-                  onClick={() => handleLinkClick(path)}
+                  to={path}
                   aria-current={active ? "page" : undefined}
                   className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
                     active
@@ -249,7 +241,7 @@ export default function Navbar() {
                   }`}
                 >
                   {label}
-                </button>
+                </Link>
               );
             })}
           </div>
