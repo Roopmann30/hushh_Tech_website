@@ -1,8 +1,8 @@
 import React from "react";
 import img from "../../files/img.png";
 import img2 from "../../files/img (1).png";
-import { Box, Container, Heading, Text, SimpleGrid, Flex, Image, VStack, HStack, Icon } from "@chakra-ui/react";
-import { FaCheckCircle } from "react-icons/fa";
+import { Box, Container, Heading, Text, SimpleGrid, Flex, Image } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 export default function Leadership() {
   return (
@@ -260,7 +260,7 @@ export default function Leadership() {
               className="bg-white p-12 rounded-2xl border border-gray-100 hover:shadow-sm transition-all duration-300"
             >
               <Flex className="flex items-start gap-6">
-                <Box className="text-4xl mt-2">
+                <Box className="text-4xl mt-2" role="img" aria-label="Money Bag">
                   💰
                 </Box>
                 <Box className="flex-1">
@@ -283,7 +283,7 @@ export default function Leadership() {
               className="bg-white p-12 rounded-2xl border border-gray-100 hover:shadow-sm transition-all duration-300"
             >
               <Flex className="flex items-start gap-6">
-                <Box className="text-4xl mt-2">
+                <Box className="text-4xl mt-2" role="img" aria-label="Building">
                   🏢
                 </Box>
                 <Box className="flex-1">
@@ -306,7 +306,7 @@ export default function Leadership() {
               className="bg-white p-12 rounded-2xl border border-gray-100 hover:shadow-sm transition-all duration-300"
             >
               <Flex className="flex items-start gap-6">
-                <Box className="text-4xl mt-2">
+                <Box className="text-4xl mt-2" role="img" aria-label="Lightning Bolt">
                   ⚡
                 </Box>
                 <Box className="flex-1">
@@ -329,7 +329,7 @@ export default function Leadership() {
               className="bg-white p-12 rounded-2xl border border-gray-100 hover:shadow-sm transition-all duration-300"
             >
               <Flex className="flex items-start gap-6">
-                <Box className="text-4xl mt-2">
+                <Box className="text-4xl mt-2" role="img" aria-label="Glowing Star">
                   🌟
                 </Box>
                 <Box className="flex-1">
@@ -352,7 +352,7 @@ export default function Leadership() {
               className="bg-white p-12 rounded-2xl border border-gray-100 hover:shadow-sm transition-all duration-300"
             >
               <Flex className="flex items-start gap-6">
-                <Box className="text-4xl mt-2">
+                <Box className="text-4xl mt-2" role="img" aria-label="Chart Increasing">
                   📈
                 </Box>
                 <Box className="flex-1">
@@ -394,12 +394,11 @@ export default function Leadership() {
             // mx="auto"
           >
             <Box 
-              as="button"
+              as={Link}
+              to="/contact"
               background={'linear-gradient(to right, #00A9E0, #6DD3EF)'}
               color="white"
-              
               borderRadius="full"
-              onClick={() => window.location.href = "/contact"}
               fontWeight="medium"
               px={{md:16,base:4}}
               py={2}
@@ -409,11 +408,11 @@ export default function Leadership() {
             </Box>
             
             <Box 
-              as="button"
+              as={Link}
+              to="/signUp"
               bg="transparent"
               color="#0891B2"
               py={2}
-              onClick={() => window.location.href = "/signUp"}
               px={{md:16,base:4}}
               borderRadius="full"
               fontWeight="medium"
