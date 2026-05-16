@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   Heading, 
@@ -26,9 +26,11 @@ interface MarketUpdateGalleryProps {
   apiDateFormat?: boolean; // Flag to indicate if date is in DD/MM/YYYY format
 }
 
+// Common image extensions to try
+const extensions = ['.png', '.jpg', '.jpeg'];
+
 const MarketUpdateGallery: React.FC<MarketUpdateGalleryProps> = ({
   date,
-  showTestImage = false,
   title = "Supporting Charts & Data",
   imageCount = 6,
   apiDateFormat = false
@@ -37,7 +39,16 @@ const MarketUpdateGallery: React.FC<MarketUpdateGalleryProps> = ({
   const [imagesLoaded, setImagesLoaded] = useState<{[key: string]: boolean}>({});
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [prevDate, setPrevDate] = useState(date);
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Reset state when date changes
+  if (date !== prevDate) {
+    setPrevDate(date);
+    setIsLoading(true);
+    setImages([]);
+    setImagesLoaded({});
+  }
   
   // Define the base URL for Supabase storage
   const baseUrl = getSupabaseStoragePublicUrl('website');
@@ -55,12 +66,7 @@ const MarketUpdateGallery: React.FC<MarketUpdateGalleryProps> = ({
   
   const folderPath = formatFolderPath(date, apiDateFormat);
   
-  // Common image extensions to try
-  const extensions = ['.png', '.jpg', '.jpeg'];
-  
   useEffect(() => {
-    setIsLoading(true);
-    
     // Generate a comprehensive set of possible image URLs to try
     const possibleImages = [];
     
@@ -123,7 +129,7 @@ const MarketUpdateGallery: React.FC<MarketUpdateGalleryProps> = ({
     onOpen();
   };
 
-  const handlePreviousImage = () => {
+  const handlePreviousImage = useCallback(() => {
     setSelectedImageIndex(currentIndex => {
       if (currentIndex === null || images.length === 0) {
         return currentIndex;
@@ -131,9 +137,9 @@ const MarketUpdateGallery: React.FC<MarketUpdateGalleryProps> = ({
 
       return (currentIndex - 1 + images.length) % images.length;
     });
-  };
+  }, [images.length]);
 
-  const handleNextImage = () => {
+  const handleNextImage = useCallback(() => {
     setSelectedImageIndex(currentIndex => {
       if (currentIndex === null || images.length === 0) {
         return currentIndex;
@@ -141,7 +147,22 @@ const MarketUpdateGallery: React.FC<MarketUpdateGalleryProps> = ({
 
       return (currentIndex + 1) % images.length;
     });
-  };
+  }, [images.length]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        handlePreviousImage();
+      } else if (event.key === 'ArrowRight') {
+        handleNextImage();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, handlePreviousImage, handleNextImage]);
 
   const selectedImage = selectedImageIndex === null ? null : images[selectedImageIndex];
   const hasCarouselControls = images.length > 1 && selectedImageIndex !== null;

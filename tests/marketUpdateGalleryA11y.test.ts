@@ -119,4 +119,53 @@ describe("MarketUpdateGallery accessibility", () => {
       ),
     ).not.toBeNull();
   });
+
+  it("navigates with keyboard arrow keys when modal is open", async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(
+          ChakraProvider,
+          null,
+          React.createElement(MarketUpdateGallery, {
+            date: "dmu-test",
+          }),
+        ),
+      );
+    });
+    await flushPromises();
+
+    const chartButtons = Array.from(
+      container.querySelectorAll<HTMLButtonElement>(
+        'button[aria-label^="Open market analysis chart"]',
+      ),
+    );
+
+    await act(async () => {
+      chartButtons[0].click();
+    });
+
+    await act(async () => {
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }),
+      );
+    });
+
+    expect(
+      document.body.querySelector(
+        'img[alt="Full-screen market analysis chart 2"]',
+      ),
+    ).not.toBeNull();
+
+    await act(async () => {
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }),
+      );
+    });
+
+    expect(
+      document.body.querySelector(
+        'img[alt="Full-screen market analysis chart 1"]',
+      ),
+    ).not.toBeNull();
+  });
 });
