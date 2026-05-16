@@ -2,9 +2,11 @@ import { cn } from '../lib/utils'
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
-  color?: 'blue' | 'slate' | 'white'
+  color?: 'blue' | 'slate' | 'white' | 'primary'
   fullPage?: boolean
   label?: string
+  className?: string
+  showLabel?: boolean
 }
 
 const sizeMap = {
@@ -14,9 +16,10 @@ const sizeMap = {
 }
 
 const colorMap = {
-  blue: 'border-gray-300 border-t-blue-500',
-  slate: 'border-slate-200 border-t-slate-700',
+  blue: 'border-blue-200 border-t-blue-600 dark:border-blue-900 dark:border-t-blue-400',
+  slate: 'border-slate-200 border-t-slate-700 dark:border-slate-700 dark:border-t-slate-300',
   white: 'border-white/40 border-t-white',
+  primary: 'border-primary/30 border-t-primary',
 }
 
 const LoadingSpinner = ({
@@ -24,6 +27,8 @@ const LoadingSpinner = ({
   color = 'blue',
   fullPage = false,
   label = 'Loading',
+  className,
+  showLabel = false,
 }: LoadingSpinnerProps) => {
   const spinner = (
     <div
@@ -38,18 +43,20 @@ const LoadingSpinner = ({
 
   const status = (
     <div
-      className="inline-flex items-center justify-center"
+      className={cn("inline-flex items-center justify-center gap-2", className)}
       role="status"
       aria-live="polite"
     >
       {spinner}
-      <span className="sr-only">{label}</span>
+      <span className={showLabel ? "text-sm font-medium text-slate-600 dark:text-slate-300" : "sr-only"}>
+        {label}
+      </span>
     </div>
   )
 
   if (fullPage) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
         {status}
       </div>
     )
