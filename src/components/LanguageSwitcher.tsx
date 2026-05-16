@@ -216,7 +216,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'light' }
           className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 z-[200]"
         >
           {languages.map((lang, index) => {
-            const isSelected = i18n.language === lang.code;
+            const isSelected = baseLangCode === lang.code;
             return (
               <button
                 key={lang.code}
