@@ -1,24 +1,8 @@
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { FaGlobe, FaAt, FaRss, FaPhone } from "react-icons/fa";
 import HushhLogo from "./images/Hushhogo.png";
-import { useAuthSession } from "../auth/AuthSessionProvider";
 
 export default function Footer() {
-  const { status } = useAuthSession();
-  const isLoggedIn = status === "authenticated";
 
-  // Function to handle PDF download
-  const handleDownload = (pdfPath: string) => {
-    if (isLoggedIn) {
-      const link = document.createElement("a");
-      link.href = pdfPath;
-      link.download = pdfPath.split("/").pop() || "download";
-      link.click();
-    } else {
-      toast.error("Please log in first to access this content.");
-    }
-  };
 
   return (
     <footer className="relative z-10 bg-[#0B0C10] border-t border-[#1F2937]">
@@ -57,7 +41,7 @@ export default function Footer() {
               </p>
             </div>
             <div className="bg-[#135bec]/20 p-2 rounded-full">
-              <FaPhone className="text-[#135bec]" />
+              <FaPhone className="text-[#135bec]" aria-hidden="true" />
             </div>
           </div>
         </div>
@@ -70,7 +54,7 @@ export default function Footer() {
           <h3 className="text-white tracking-wide text-sm uppercase font-bold text-opacity-80">
             Quick Links
           </h3>
-          <nav className="flex flex-col gap-0 border-l border-[#1F2937] pl-4">
+          <nav className="flex flex-col gap-0 border-l border-[#1F2937] pl-4" aria-label="Quick links">
             <div className="grid grid-cols-2 gap-x-8">
               <div className="space-y-0">
                 <a 
@@ -141,7 +125,7 @@ export default function Footer() {
           <h3 className="text-white tracking-wide text-sm uppercase font-bold text-opacity-80">
             Legal
           </h3>
-          <nav className="flex flex-col gap-0 border-l border-[#1F2937] pl-4">
+          <nav className="flex flex-col gap-0 border-l border-[#1F2937] pl-4" aria-label="Legal information">
             <a 
               href="/privacy-policy" 
               className="py-2 text-gray-300 hover:text-white text-base font-medium flex items-center justify-between group transition-colors duration-200"
@@ -161,7 +145,7 @@ export default function Footer() {
               California Privacy Policy
             </a>
             <a 
-              href="/carrer-privacy-policy" 
+              href="/career-privacy-policy" 
               className="py-2 text-gray-300 hover:text-white text-base font-medium flex items-center justify-between group transition-colors duration-200"
             >
               Careers Site Privacy Notice
@@ -182,20 +166,23 @@ export default function Footer() {
             target="_blank" 
             rel="noopener noreferrer" 
             className="w-10 h-10 rounded-full bg-[#1F2937] flex items-center justify-center hover:bg-[#135bec] transition-colors group"
+            aria-label="Visit our main website"
           >
-            <FaGlobe className="text-gray-400 group-hover:text-white text-base" />
+            <FaGlobe className="text-gray-400 group-hover:text-white text-base" aria-hidden="true" />
           </a>
           <a 
             href="mailto:support@hushh.ai" 
             className="w-10 h-10 rounded-full bg-[#1F2937] flex items-center justify-center hover:bg-[#135bec] transition-colors group"
+            aria-label="Send us an email"
           >
-            <FaAt className="text-gray-400 group-hover:text-white text-base" />
+            <FaAt className="text-gray-400 group-hover:text-white text-base" aria-hidden="true" />
           </a>
           <a 
             href="/community" 
             className="w-10 h-10 rounded-full bg-[#1F2937] flex items-center justify-center hover:bg-[#135bec] transition-colors group"
+            aria-label="Visit our community page"
           >
-            <FaRss className="text-gray-400 group-hover:text-white text-base" />
+            <FaRss className="text-gray-400 group-hover:text-white text-base" aria-hidden="true" />
           </a>
         </div>
 
@@ -215,8 +202,6 @@ export default function Footer() {
       {/* Safe Area Spacer for iOS Home Indicator */}
       <div className="h-6 w-full"></div>
 
-      {/* Toast Notification Container */}
-      <ToastContainer position="top-right" autoClose={3000} />
     </footer>
   );
 }
