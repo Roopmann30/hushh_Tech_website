@@ -21,7 +21,7 @@ import { requestFileAccess } from "../services/access/accessControlApi";
 interface NDARequestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  session: any; // Contains the logged-in user's session (including access_token)
+  session: { access_token: string } | null | undefined; // Contains the logged-in user's session (including access_token)
   onSubmit: (result: string) => void;
 }
 
@@ -32,16 +32,20 @@ const NDARequestModal: React.FC<NDARequestModalProps> = ({
   onSubmit,
 }) => {
   const [investorType, setInvestorType] = useState("Individual");
-  const [metadata, setMetadata] = useState<any>({});
+  const [metadata, setMetadata] = useState<Record<string, string>>({});
   const toast = useToast();
 
   // Update the metadata with form values
   const handleInputChange = (field: string, value: string) => {
-    setMetadata((prev: any) => ({ ...prev, [field]: value }));
+    setMetadata((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async () => {
     try {
+      if (!session?.access_token) {
+        throw new Error("No active session or access token found.");
+      }
+
       const resData = await requestFileAccess(session.access_token, {
         investorType,
         metadata: JSON.stringify(metadata),
@@ -97,11 +101,27 @@ const NDARequestModal: React.FC<NDARequestModalProps> = ({
           isClosable: true,
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting request:", error);
+      interface ResponseError {
+        response?: {
+          data?: {
+            message?: string;
+          } | string;
+        };
+      }
+      const err = error as ResponseError;
+      let errorMessage = "Could not submit your request.";
+      if (err.response?.data) {
+        errorMessage = (typeof err.response.data === "object"
+          ? err.response.data.message
+          : err.response.data) || errorMessage;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       toast({
         title: "Submission Failed",
-        description: error.response?.data || "Could not submit your request.",
+        description: errorMessage,
         status: "error",
         duration: 4000,
         isClosable: true,
