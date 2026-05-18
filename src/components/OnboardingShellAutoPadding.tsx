@@ -28,14 +28,19 @@ export default function OnboardingShellAutoPadding() {
     let timeoutId: number | null = null;
     const resizeObservers: ResizeObserver[] = [];
     const windowResizeHandlers: Array<() => void> = [];
+    const observedShells = new WeakSet<HTMLElement>();
 
     const applyForShell = (shell: HTMLElement) => {
+      if (observedShells.has(shell)) return;
+
       const footer = shell.querySelector<HTMLElement>('[data-onboarding-footer]');
       if (!footer) {
         // Fallback is defined in CSS; remove any stale per-shell override.
         shell.style.removeProperty('--onboarding-footer-space');
         return;
       }
+
+      observedShells.add(shell);
 
       const update = () => {
         const rect = footer.getBoundingClientRect();
