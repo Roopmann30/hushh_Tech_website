@@ -16,7 +16,14 @@ export function PaywallOverlay({ profileName, slug, onPayment }: PaywallOverlayP
 
   const handlePayment = async () => {
     setIsProcessing(true);
-    await onPayment();
+    console.log(`Initiating premium payment flow for profile: ${slug}`);
+    try {
+      await onPayment();
+    } catch (error) {
+      console.error(`Payment flow failed for profile: ${slug}`, error);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
