@@ -19,8 +19,8 @@ import { acceptNda, generateNdaPdfBlob } from "../services/access/accessControlA
 interface NDADocumentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  ndaMetadata: any;
-  session: any;
+  ndaMetadata: Record<string, unknown> | null | undefined;
+  session: { access_token: string } | null | undefined;
   onAccept: () => void;
 }
 
@@ -59,9 +59,13 @@ const NDADocumentModal: React.FC<NDADocumentModalProps> = ({
     try {
       console.log("Generating NDA PDF with metadata:", ndaMetadata);
       
+      if (!session?.access_token) {
+        throw new Error("No active session or access token found.");
+      }
+
       const responseBlob = await generateNdaPdfBlob(
         session.access_token,
-        ndaMetadata
+        ndaMetadata || {}
       );
       
       // Close the loading toast
@@ -81,7 +85,7 @@ const NDADocumentModal: React.FC<NDADocumentModalProps> = ({
         duration: 3000,
         isClosable: true,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error generating NDA PDF:", error);
       
       // Close the loading toast
@@ -90,19 +94,29 @@ const NDADocumentModal: React.FC<NDADocumentModalProps> = ({
       // More detailed error handling
       let errorMessage = "Failed to generate NDA PDF.";
       
-      if (error.response) {
+      const err = error as {
+        response?: {
+          data?: { message?: string } | Blob;
+          statusText?: string;
+        };
+      };
+
+      if (err.response) {
         // Server responded with an error
-        if (error.response.data instanceof Blob) {
+        if (err.response.data instanceof Blob) {
           // Try to read the error message from the Blob
           try {
-            const text = await error.response.data.text();
-            const errorData = JSON.parse(text);
+            const text = await err.response.data.text();
+            const errorData = JSON.parse(text) as { message?: string };
             errorMessage = errorData.message || errorMessage;
           } catch (e) {
             console.error("Error parsing error blob:", e);
           }
         } else {
-          errorMessage = error.response.data?.message || error.response.statusText || errorMessage;
+          const responseData = err.response.data;
+          errorMessage = (responseData && typeof responseData === "object" && "message" in responseData
+            ? (responseData as { message?: string }).message
+            : null) || err.response.statusText || errorMessage;
         }
       }
       
@@ -123,7 +137,10 @@ const NDADocumentModal: React.FC<NDADocumentModalProps> = ({
   useEffect(() => {
     // Only generate PDF when modal is open and we have metadata
     if (isOpen && ndaMetadata && !pdfUrl) {
-      generateNdaPDF();
+      const timer = setTimeout(() => {
+        generateNdaPDF();
+      }, 0);
+      return () => clearTimeout(timer);
     }
     
     // Reset the apiCalledRef when the modal closes
@@ -134,9 +151,12 @@ const NDADocumentModal: React.FC<NDADocumentModalProps> = ({
     return () => {
       if (pdfUrl) {
         URL.revokeObjectURL(pdfUrl);
-        setPdfUrl(null);
+        setTimeout(() => {
+          setPdfUrl(null);
+        }, 0);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, ndaMetadata]);
 
   const downloadPDF = () => {
@@ -164,6 +184,9 @@ const NDADocumentModal: React.FC<NDADocumentModalProps> = ({
     if (isSubmitting) return; // Prevent multiple clicks
     setIsSubmitting(true);
     try {
+      if (!session?.access_token) {
+        throw new Error("No active session or access token found.");
+      }
       const resData = await acceptNda(session.access_token);
       console.log("Accept NDA Response:", resData);
       if (resData === "Approved" || resData === "Already Approved") {
@@ -180,11 +203,12 @@ const NDADocumentModal: React.FC<NDADocumentModalProps> = ({
           onClose();
         }, 100);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error accepting NDA:", error);
+      const err = error as { response?: { data?: string } };
       toast({
         title: "Error",
-        description: error.response?.data || "Could not accept NDA.",
+        description: err.response?.data || "Could not accept NDA.",
         status: "error",
         duration: 4000,
         isClosable: true,
