@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useModalKeyboardNavigation } from '../hooks/useModalKeyboardNavigation';
 
 interface PermissionHelpModalProps {
@@ -7,7 +7,15 @@ interface PermissionHelpModalProps {
 }
 
 const PermissionHelpModal = ({ isOpen, onClose }: PermissionHelpModalProps) => {
-  const [browser, setBrowser] = useState<string>('chrome');
+  const [browser] = useState<string>(() => {
+    if (typeof navigator === 'undefined') return 'chrome';
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.includes('edg')) return 'edge';
+    if (userAgent.includes('chrome')) return 'chrome';
+    if (userAgent.includes('firefox')) return 'firefox';
+    if (userAgent.includes('safari')) return 'safari';
+    return 'chrome';
+  });
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -17,20 +25,6 @@ const PermissionHelpModal = ({ isOpen, onClose }: PermissionHelpModalProps) => {
     initialFocusRef: closeButtonRef,
     onClose,
   });
-
-  useEffect(() => {
-    // Detect browser
-    const userAgent = navigator.userAgent.toLowerCase();
-    if (userAgent.includes('edg')) {
-      setBrowser('edge');
-    } else if (userAgent.includes('chrome')) {
-      setBrowser('chrome');
-    } else if (userAgent.includes('firefox')) {
-      setBrowser('firefox');
-    } else if (userAgent.includes('safari')) {
-      setBrowser('safari');
-    }
-  }, []);
 
   if (!isOpen) return null;
 
