@@ -18,7 +18,6 @@ import {
   Input,
   Flex,
   Checkbox,
-  Textarea,
 } from "@chakra-ui/react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -26,7 +25,7 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { requestFileAccess } from "../services/access/accessControlApi";
 
 interface NDARequestModalProps {
-  session: any; // Contains the logged-in user's session (including access_token)
+  session: { access_token: string } | null | undefined; // Contains the logged-in user's session (including access_token)
   onSubmit: (result: string) => void;
   isOpen?: boolean; // Optional property for when used in a modal context
   onClose?: () => void; // Optional property for when used in a modal context
@@ -61,11 +60,10 @@ const NDARequestModalComponent: React.FC<NDARequestModalProps> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [investorType, setInvestorType] = useState("Individual");
-  const [metadata, setMetadata] = useState<any>({});
-  const [formErrors, setFormErrors] = useState<any>({});
+  const [metadata, setMetadata] = useState<Record<string, string>>({});
+  const [formErrors, setFormErrors] = useState<Record<string, string | null>>({});
   const [ndaConfirmed, setNdaConfirmed] = useState(false);
   const [ndaTermsAccepted, setNdaTermsAccepted] = useState(false);
-  const [showNdaDocModal, setShowNdaDocModal] = useState(false);
   const toast = useToast();
 
   // Handle modal close if component is used as a modal
@@ -76,15 +74,15 @@ const NDARequestModalComponent: React.FC<NDARequestModalProps> = ({
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setMetadata((prev: any) => ({ ...prev, [field]: value }));
+    setMetadata((prev) => ({ ...prev, [field]: value }));
     // Clear error for the field being changed
     if (formErrors[field]) {
-      setFormErrors((prevErrors: any) => ({ ...prevErrors, [field]: null }));
+      setFormErrors((prevErrors) => ({ ...prevErrors, [field]: null }));
     }
   };
 
   const validateStep1 = () => {
-    const errors: any = {};
+    const errors: Record<string, string> = {};
     if (investorType === "Individual") {
       if (!metadata.name?.trim()) errors.name = "Full Name is required.";
       if (!metadata.state?.trim()) errors.state = "State for taxation is required.";
@@ -165,6 +163,9 @@ const NDARequestModalComponent: React.FC<NDARequestModalProps> = ({
       );
     }
     try {
+      if (!session?.access_token) {
+        throw new Error("No active session or access token found.");
+      }
       const resData = await requestFileAccess(session.access_token, {
         investorType,
         metadata: JSON.stringify(formattedMetadata),
@@ -204,9 +205,24 @@ const NDARequestModalComponent: React.FC<NDARequestModalProps> = ({
         onSubmit(resData);
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting request:", error);
-      const errorMessage = error.response?.data?.message || error.response?.data || "Could not submit your NDA request.";
+      interface ResponseError {
+        response?: {
+          data?: {
+            message?: string;
+          } | string;
+        };
+      }
+      const err = error as ResponseError;
+      let errorMessage = "Could not submit your NDA request.";
+      if (err.response?.data) {
+        errorMessage = (typeof err.response.data === "object"
+          ? err.response.data.message
+          : err.response.data) || errorMessage;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       toast({
         title: "Submission Failed",
         description: errorMessage,
@@ -523,7 +539,7 @@ const NDARequestModalComponent: React.FC<NDARequestModalProps> = ({
               isChecked={ndaConfirmed}
               onChange={(e) => {
                 setNdaConfirmed(e.target.checked);
-                if (formErrors.ndaConfirmed) setFormErrors((prev: any) => ({...prev, ndaConfirmed: null}));
+                if (formErrors.ndaConfirmed) setFormErrors((prev) => ({...prev, ndaConfirmed: null}));
               }}
               mt={1}
             />
@@ -542,7 +558,7 @@ const NDARequestModalComponent: React.FC<NDARequestModalProps> = ({
               isChecked={ndaTermsAccepted}
               onChange={(e) => {
                 setNdaTermsAccepted(e.target.checked);
-                if (formErrors.ndaTermsAccepted) setFormErrors((prev: any) => ({...prev, ndaTermsAccepted: null}));
+                if (formErrors.ndaTermsAccepted) setFormErrors((prev) => ({...prev, ndaTermsAccepted: null}));
               }}
               mt={1}
             />
