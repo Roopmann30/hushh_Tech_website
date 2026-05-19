@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import config from '../resources/config/config';
 import {
@@ -31,18 +31,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [authorizedCheckKey, setAuthorizedCheckKey] = useState<string | null>(null);
   const isAuthorized =
     status === 'authenticated' && authorizedCheckKey === authCheckKey;
-  const bootTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Boot timeout safety net — if isLoading stays true for >8 seconds
   // (e.g., auth status stuck at 'booting'), redirect to login instead
   // of showing an infinite spinner. With the AuthSessionProvider fix
   // (instant boot from localStorage), this should rarely trigger.
   useEffect(() => {
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+
     if (isLoading) {
-      if (bootTimeoutRef.current) {
-        clearTimeout(bootTimeoutRef.current);
-      }
-      bootTimeoutRef.current = setTimeout(() => {
+      timerId = setTimeout(() => {
         console.warn(
           '[ProtectedRoute] Boot timeout reached (8s). Redirecting to login.'
         );
@@ -52,15 +50,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
           { replace: true }
         );
       }, BOOT_TIMEOUT_MS);
-    } else if (bootTimeoutRef.current) {
-      clearTimeout(bootTimeoutRef.current);
-      bootTimeoutRef.current = null;
     }
 
     return () => {
-      if (bootTimeoutRef.current) {
-        clearTimeout(bootTimeoutRef.current);
-        bootTimeoutRef.current = null;
+      if (timerId) {
+        clearTimeout(timerId);
       }
     };
   }, [isLoading, location.hash, location.pathname, location.search, navigate]);
