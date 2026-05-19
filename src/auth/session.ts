@@ -69,8 +69,14 @@ export function clearLegacyAuthStorage() {
   }
 
   LEGACY_AUTH_STORAGE_KEYS.forEach((key) => {
-    window.localStorage.removeItem(key);
-    window.sessionStorage.removeItem(key);
+    if (typeof window !== 'undefined') {
+      if (window.localStorage && typeof window.localStorage.removeItem === 'function') {
+        window.localStorage.removeItem(key);
+      }
+      if (window.sessionStorage && typeof window.sessionStorage.removeItem === 'function') {
+        window.sessionStorage.removeItem(key);
+      }
+    }
   });
 }
 

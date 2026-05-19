@@ -15,8 +15,14 @@ vi.mock("../src/resources/config/config", () => ({
 describe("site analytics client", () => {
   beforeEach(() => {
     vi.resetModules();
-    window.localStorage.clear();
-    window.sessionStorage.clear();
+    if (typeof window !== 'undefined') {
+      if (window.localStorage && typeof window.localStorage.clear === 'function') {
+        window.localStorage.clear();
+      }
+      if (window.sessionStorage && typeof window.sessionStorage.clear === 'function') {
+        window.sessionStorage.clear();
+      }
+    }
     window.history.replaceState(
       {},
       "",
