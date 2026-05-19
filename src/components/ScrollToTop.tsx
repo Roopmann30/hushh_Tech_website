@@ -10,16 +10,20 @@ export default function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches;
+    // Defensively guard window APIs to prevent TypeError crashes in JSDOM tests or SSR
+    const prefersReducedMotion =
+      typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        : false;
 
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      // Respect vestibular / motion settings; keep non-animated scroll otherwise.
-      behavior: prefersReducedMotion ? 'instant' : 'auto',
-    });
+    if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        // Respect vestibular / motion settings; keep non-animated scroll otherwise.
+        behavior: prefersReducedMotion ? 'instant' : 'auto',
+      });
+    }
   }, [pathname]);
 
   return null; // This component doesn't render anything
