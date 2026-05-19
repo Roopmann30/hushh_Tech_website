@@ -15,6 +15,19 @@ export function PrimaryCtaButton({
   _focusVisible,
   ...rest
 }: PrimaryCtaButtonProps) {
+  let renderedChildren = children;
+  if (typeof children === "string" && children.endsWith("→")) {
+    const baseText = children.slice(0, -1).trim();
+    renderedChildren = (
+      <>
+        {baseText}
+        <span aria-hidden="true" style={{ marginLeft: "6px", display: "inline-block" }}>
+          →
+        </span>
+      </>
+    );
+  }
+
   return (
     <Button
       type="button"
@@ -47,7 +60,7 @@ export function PrimaryCtaButton({
         ..._focusVisible,
       }}
     >
-      {children}
+      {renderedChildren}
     </Button>
   );
 }
