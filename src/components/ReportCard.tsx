@@ -10,21 +10,16 @@ interface ReportCardProps {
 
 const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
   return (
-    <Box
-      key={report.id}
-      mb={6}
-      _hover={{
-        "& > p:last-of-type": {
-          textDecoration: "underline"
-        }
-      }}
-    >
+    <Box as="article" mb={6}>
       {/* Date in red, bold */}
       <Text
+        as="time"
+        dateTime={report.date}
         color="red.600"
         fontWeight="500"
         fontSize={{ base: "sm", md: "md" }}
         mb={1}
+        display="block"
       >
         {formatShortDate(report.date)}
       </Text>
@@ -32,6 +27,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
       {/* Title as a link */}
       <Link to={`/reports/${report.id}`}>
         <Text
+          as="h3"
           color="gray.900"
           fontSize={{ base: "md", md: "lg" }}
           _hover={{ textDecoration: "underline" }}
