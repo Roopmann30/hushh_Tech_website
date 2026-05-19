@@ -32,6 +32,7 @@ const GammaEmbed: React.FC<GammaEmbedProps> = ({ title, description, src }) => {
           src={src}
           title={title}
           allowFullScreen
+          loading="lazy"
           width="100%"
           minHeight={{ base: "70vh", md: "80vh" }}
           border="0"
