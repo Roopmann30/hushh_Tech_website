@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { LocationCacheRecord, LocationData } from '../src/services/location/types';
 
@@ -48,12 +48,23 @@ const baseRecord = {
 } satisfies LocationCacheRecord;
 
 describe('shared location cache', () => {
+  let originalLocalStorage: PropertyDescriptor | undefined;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
     Object.defineProperty(globalThis, 'localStorage', {
       value: createStorageMock(),
       configurable: true,
     });
+  });
+
+  afterEach(() => {
+    if (originalLocalStorage) {
+      Object.defineProperty(globalThis, 'localStorage', originalLocalStorage);
+    } else {
+      delete (globalThis as unknown as Record<string, unknown>).localStorage;
+    }
   });
 
   it('uses localStorage on web and keeps the cache user-scoped', async () => {

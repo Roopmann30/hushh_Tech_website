@@ -69,8 +69,20 @@ export function clearLegacyAuthStorage() {
   }
 
   LEGACY_AUTH_STORAGE_KEYS.forEach((key) => {
-    window.localStorage.removeItem(key);
-    window.sessionStorage.removeItem(key);
+    try {
+      if (window.localStorage && typeof window.localStorage.removeItem === "function") {
+        window.localStorage.removeItem(key);
+      }
+    } catch (e) {
+      console.warn("[AuthSession] Failed to clear legacy localStorage key:", key, e);
+    }
+    try {
+      if (window.sessionStorage && typeof window.sessionStorage.removeItem === "function") {
+        window.sessionStorage.removeItem(key);
+      }
+    } catch (e) {
+      console.warn("[AuthSession] Failed to clear legacy sessionStorage key:", key, e);
+    }
   });
 }
 
@@ -387,7 +399,7 @@ export async function clearSupabaseSession(
   }
 
   try {
-    await client.auth.signOut({ scope: "local" as any });
+    await client.auth.signOut({ scope: "local" as unknown as "global" });
   } catch (error) {
     console.warn("[AuthSession] Local sign-out fallback failed:", error);
   }
@@ -404,7 +416,9 @@ export function broadcastAuthEvent(reason: AuthSessionReason) {
   };
 
   try {
-    window.localStorage.setItem(AUTH_EVENT_STORAGE_KEY, JSON.stringify(payload));
+    if (window.localStorage && typeof window.localStorage.setItem === "function") {
+      window.localStorage.setItem(AUTH_EVENT_STORAGE_KEY, JSON.stringify(payload));
+    }
   } catch (error) {
     console.warn("[AuthSession] Failed to broadcast auth event:", error);
   }

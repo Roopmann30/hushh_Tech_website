@@ -15,6 +15,32 @@ vi.mock("../src/resources/config/config", () => ({
 describe("site analytics client", () => {
   beforeEach(() => {
     vi.resetModules();
+
+    const createMockStorage = () => {
+      const store = new Map<string, string>();
+      return {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => { store.set(key, value); },
+        removeItem: (key: string) => { store.delete(key); },
+        clear: () => { store.clear(); },
+      };
+    };
+
+    if (!window.localStorage || typeof window.localStorage.clear !== "function") {
+      Object.defineProperty(window, "localStorage", {
+        value: createMockStorage(),
+        writable: true,
+        configurable: true,
+      });
+    }
+    if (!window.sessionStorage || typeof window.sessionStorage.clear !== "function") {
+      Object.defineProperty(window, "sessionStorage", {
+        value: createMockStorage(),
+        writable: true,
+        configurable: true,
+      });
+    }
+
     window.localStorage.clear();
     window.sessionStorage.clear();
     window.history.replaceState(
