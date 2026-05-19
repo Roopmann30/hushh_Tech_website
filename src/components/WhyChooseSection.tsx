@@ -140,7 +140,7 @@ const FeatureCard = ({ item }: { item: typeof featureCards[0] }) => {
         justify="center"
         bg={item.iconBg}
       >
-        <Icon as={item.icon} boxSize="18px" color={item.iconColor} />
+        <Icon as={item.icon} boxSize="18px" color={item.iconColor} aria-hidden="true" />
       </Flex>
 
       <VStack spacing={2} textAlign="center">
@@ -169,13 +169,15 @@ const FeatureCard = ({ item }: { item: typeof featureCards[0] }) => {
 };
 
 const WhyChooseSection = () => {
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   const navigate = useNavigate();
 
   return (
     <Box
       ref={sectionRef}
+      as="section"
+      aria-labelledby="why-choose-heading"
       bg="white"
       display="flex"
       justifyContent="center"
@@ -221,6 +223,7 @@ const WhyChooseSection = () => {
 
         <MotionBox variants={itemVariants} textAlign="center" mb={8}>
           <Heading
+            id="why-choose-heading"
             as="h2"
             fontSize={{ base: "40px", md: "44px" }}
             fontWeight="700"
@@ -281,7 +284,7 @@ const WhyChooseSection = () => {
                   borderColor={chip.border}
                   boxShadow="0px 1px 2px 0px rgba(0,0,0,0.05)"
                 >
-                  <Icon as={chip.icon} boxSize="12px" color={chip.iconColor} />
+                  <Icon as={chip.icon} boxSize="12px" color={chip.iconColor} aria-hidden="true" />
                   <Text
                     fontSize="14px"
                     fontWeight="600"
@@ -309,7 +312,7 @@ const WhyChooseSection = () => {
               borderColor={trustChips[2].border}
               boxShadow="0px 1px 2px 0px rgba(0,0,0,0.05)"
             >
-              <Icon as={trustChips[2].icon} boxSize="12px" color={trustChips[2].iconColor} />
+              <Icon as={trustChips[2].icon} boxSize="12px" color={trustChips[2].iconColor} aria-hidden="true" />
               <Text
                 fontSize="14px"
                 fontWeight="600"
