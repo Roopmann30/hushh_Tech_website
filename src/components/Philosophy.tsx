@@ -54,7 +54,7 @@ export default function Philosophy() {
         <h2 className="text-2xl md:text-3xl font-bold mb-8">Our <span className="text-red-600">Investment Philosophy</span></h2>
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
           <div>
-            <div className="mb-4" aria-hidden>
+            <div className="mb-4" aria-hidden="true">
               <span className="text-4xl">∫𝑥</span>
             </div>
             <h3 className="text-xl font-bold mb-2">Math-Driven Precision</h3>
@@ -63,7 +63,7 @@ export default function Philosophy() {
             </p>
           </div>
           <div>
-            <div className="mb-4" aria-hidden>
+            <div className="mb-4" aria-hidden="true">
               <span className="text-4xl">🧠</span>
             </div>
             <h3 className="text-xl font-bold mb-2">AI-Powered Insight</h3>
@@ -72,7 +72,7 @@ export default function Philosophy() {
             </p>
           </div>
           <div>
-            <div className="mb-4" aria-hidden>
+            <div className="mb-4" aria-hidden="true">
               <span className="text-4xl">⚖️</span>
             </div>
             <h3 className="text-xl font-bold mb-2">Long-Term Stability</h3>
@@ -85,7 +85,7 @@ export default function Philosophy() {
 
       {/* Why Choose Us Section */}
       <section className="text-center mb-16 space-y-8">
-        <h2 className="text-2xl md:text-3xl font-bold mb-8">Why Choose Hu<span className="text-red-600">$$</span>h?</h2>
+        <h2 className="text-2xl md:text-3xl font-bold mb-8" aria-label="Why Choose Hushh?">Why Choose Hu<span className="text-red-600" aria-hidden="true">$$</span>h?</h2>
         <div>
           <h3 className="text-xl font-bold mb-2">Simplicity Meets Sophistication</h3>
           <p className="text-sm">
@@ -120,7 +120,7 @@ export default function Philosophy() {
         <h2 className="text-2xl md:text-3xl font-bold mb-6">Join <span className="text-red-600">Us</span></h2>
         <p className="mb-8">
           Whether you're an individual or an institution, Hushh{' '}
-          <span aria-hidden>🤫</span> Technologies LLC invites you to join us on our journey.
+          <span aria-hidden="true">🤫</span> Technologies LLC invites you to join us on our journey.
         </p>
         <div className="flex justify-center">
           <a
