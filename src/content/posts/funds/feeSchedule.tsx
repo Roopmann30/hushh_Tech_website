@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Text, Heading, List, ListItem, Divider, VStack } from '@chakra-ui/react';
-import ExhibitLPAImg from '../../../components/images/management-fees.webp';
 
 export const frontmatter = {
   title: "Hushh Technologies Alpha Fund, LP – Fee Schedule",
