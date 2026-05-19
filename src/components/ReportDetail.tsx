@@ -7,6 +7,7 @@ import {
   SimpleGrid,
   Spinner,
   AspectRatio,
+  Image,
 } from '@chakra-ui/react'
 import { Report } from '../services/reportService'
 // import { formatLongDate } from '../utils/dateFormatter'
@@ -19,8 +20,8 @@ interface ReportDetailProps {
 const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
   if (isLoading) {
     return (
-      <Box textAlign="center" py={8}>
-        <Spinner size="xl" />
+      <Box textAlign="center" py={8} role="status" aria-live="polite">
+        <Spinner size="xl" aria-hidden="true" />
       </Box>
     )
   }
@@ -60,17 +61,15 @@ const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
             Charts & Data
           </Heading>
           <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={4}>
-            {report.image_urls.map((src, i) => (
-              <img
+            {report.public_image_urls.map((src, i) => (
+              <Image
                 key={i}
                 src={src}
                 alt={`${report.title || 'Report'} — chart ${i + 1}`}
-                style={{
-                  width: '100%',
-                  height: '400px',
-                  objectFit: 'cover',
-                  borderRadius: 'md'
-                }}
+                w="100%"
+                h="400px"
+                objectFit="cover"
+                borderRadius="md"
               />
             ))}
           </SimpleGrid>
@@ -83,7 +82,7 @@ const ReportDetail: React.FC<ReportDetailProps> = ({ report, isLoading }) => {
             Related Videos
           </Heading>
           <SimpleGrid columns={{ base: 1, md: report.public_video_urls.length > 1 ? 2 : 1 }} spacing={4}>
-            {report.video_urls.map((src, i) => (
+            {report.public_video_urls.map((src, i) => (
               <AspectRatio key={i} ratio={16 / 9} borderRadius="md" overflow="hidden">
                 <video
                   src={src}
